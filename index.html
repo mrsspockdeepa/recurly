@@ -371,14 +371,11 @@
 
 
     <!-- 03 -->
-    <section class="slide" id="current-journey" data-title="Current Journey">
+    <section class="slide" id="current-journey" data-title="Current State">
       <div class="eyebrow">03 · Current State</div>
       <h2 class="title">The close today, mapped end to end</h2>
       <p class="lede">Before proposing what to build, it helps to walk the current journey honestly. Every box below is a real step a revenue accountant performs today. The ones highlighted in amber are where the process breaks.</p>
 
-      <div class="callout" style="margin-top:0;">
-        <b>Threats the 2024-era posture map undersells.</b> Three worth watching: NetSuite and Sage Intacct are closing the native RevRec gap from below, making "good enough" credible for simpler contract structures. ERPs becoming adequate removes the pain that drives buyers to point solutions. Stripe has shown it will move upmarket when it has a wedge - RevRec at 0.25% is a loss-leader, not a ceiling. And the structural unbundler threat (RightRev, Leapfin) intensifies as their corpus of contract patterns grows - their moat is data, not code.
-      </div>
       <div class="chart-card" style="padding:20px 22px 24px;">
         <p class="ct">Current-state revenue recognition journey</p>
         <p class="cs" style="margin-bottom:20px;">From contract execution through audit inquiry. Amber-bordered boxes are friction points.</p>
@@ -509,7 +506,7 @@
 
     <!-- 04 -->
     <section class="slide" id="landscape" data-title="Landscape">
-      <div class="eyebrow">04 &middot; Competitive Landscape</div>
+      <div class="eyebrow">04 &middot; Landscape</div>
       <h2 class="title">Five postures, not five feature lists</h2>
       <p class="lede">Knowing which posture a competitor has chosen says more than knowing their feature set - it says where Recurly should and shouldn't compete.</p>
       <div class="posture"><h5>Zuora - the deep engine, decoupled from the ERP</h5><p>Enterprise benchmark for contract complexity. Keeps recognition logic out of the ERP entirely, preserving GL governance and SOX-grade audit trails. Wins on depth; a decade of head start.</p></div>
@@ -517,6 +514,10 @@
       <div class="posture"><h5>Chargebee - monetization complexity as the wedge</h5><p>Every pricing innovation (usage, credits, ramps) becomes a recognition obligation Finance wasn't built for. RevRec is one of seven bundled modules.</p></div>
       <div class="posture"><h5>Maxio - vertical specialist, deliberately narrow</h5><p>Purpose-built for $1M–$100M ARR B2B software. Proof that a narrow ICP is defensible even against much larger platforms.</p></div>
       <div class="posture"><h5>The unbundlers - RightRev, Leapfin, LedgerUp, Ordway</h5><p>Plug into whatever billing exists; aggregate every revenue source into one governed subledger. The real structural threat, since merchants rarely have all revenue in one place.</p></div>
+
+      <div class="callout">
+        <b>What this posture map undersells.</b> NetSuite and Sage Intacct are closing the native RevRec gap from below, making "good enough" credible for simpler contract structures and shrinking the pain that drives buyers to point solutions. Stripe has shown it will move upmarket when it has a wedge - 0.25% is a loss-leader, not a ceiling. And the unbundler threat intensifies as their corpus of contract patterns grows: their moat is data, not code, which means it compounds while we deliberate.
+      </div>
 
       <div class="chart-card">
         <p class="ct">Where the wedge sits</p>
@@ -548,7 +549,7 @@
 
     <!-- 04 -->
     <section class="slide" id="the-wedge" data-title="The Wedge">
-      <div class="eyebrow">05 &middot; Why Recurly, Why Now</div>
+      <div class="eyebrow">05 &middot; The Wedge</div>
       <h2 class="title">The differentiation isn't depth. It's lifecycle fidelity.</h2>
       <ul class="clean" style="margin-bottom:26px;">
           <li><b>Recurly won't out-allocate Zuora on SSP edge cases</b> <span class="weak">with a decade less experience. Competing on Zuora's terms is a losing bet regardless of engineering investment.</span></li>
@@ -716,7 +717,7 @@
     <div class="divider"></div>
 
     <!-- 08 -->
-    <section class="slide" id="build-buy-partner" data-title="Build, Buy, Partner">
+    <section class="slide" id="build-buy-partner" data-title="Technical Feasibility">
       <div class="eyebrow">08 &middot; Technical Feasibility</div>
       <h2 class="title">Don't build a second Zuora</h2>
       <ul class="clean" style="margin-bottom:26px;">
@@ -729,7 +730,7 @@
           <tr><th>Layer</th><th>Call</th><th>Why</th></tr>
           <tr><td data-label="Layer">Ingestion &amp; canonical event model</td><td><span class="pill own">Own</span></td><td>The differentiation lives here - turning any source system's contract changes into lifecycle events</td></tr>
           <tr><td data-label="Layer">Workflow, dashboards, audit trail</td><td><span class="pill own">Own</span></td><td>Where merchant trust is earned or lost; must be walkable by an external auditor</td></tr>
-          <tr><td data-label="Layer">Novel SSP allocation logic</td><td><span class="pill partner">Partner</span></td><td>Genuinely hard, genuinely commodity once solved - don't rebuild it from scratch</td></tr>
+          <tr><td data-label="Layer">Novel SSP allocation logic</td><td><span class="pill partner">Partner</span></td><td>Genuinely hard, genuinely commodity once solved. Candidates to evaluate before the week-6 gate: license from RightRev or Leapfin, or Trullion for the AI-assisted allocation layer. All three are also competitors, which is the tension to price into any agreement</td></tr>
           <tr><td data-label="Layer">ERP connectors (NetSuite, Intacct, SAP)</td><td><span class="pill partner">Partner</span></td><td>Mature middleware already exists (Celigo, Boomi); rebuild-risk isn't worth it</td></tr>
           <tr><td data-label="Layer">Tax logic</td><td><span class="pill partner">Partner</span></td><td>Already true for Recurly today (Avalara, Vertex)</td></tr>
         </table>
@@ -737,6 +738,15 @@
       <div class="callout">
         <b>The precondition nobody skips.</b> RevRec today is presumably wired to Recurly Subscriptions' internal event bus. Before any of this is credible externally, it needs a public ingestion contract - a schema and API surface a CPQ system, a CSV export, or a NetSuite connector can write to without knowing Recurly's internals exist.
       </div>
+
+      <div class="section-label">The migration objection, and the answer</div>
+      <p class="body">The first question in every sales conversation: "I have 400 live contracts and a signed audit opinion. How do I move mid-year without breaking the close?" The answer has to be a product decision, not a services promise.</p>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><h5>Shadow run, not cutover</h5><p>Ingest the historical contract portfolio and run recognition in parallel while the existing system stays the book of record. No production risk, no change to the close process.</p></div></div>
+        <div class="step"><div class="n">2</div><div><h5>Reconcile against closed periods</h5><p>Compare our output to their last three closed months, line by line. Variances are the product's first real test - and the reconciliation report is the artifact the auditor actually wants.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h5>Cut over at a fiscal boundary</h5><p>Switch the book of record at year end or quarter end with the shadow-run comparison as evidence. Never mid-period, never without the auditor having seen the variance report.</p></div></div>
+      </div>
+      <p class="fine">Migration is free, takes 6-10 weeks, and is staffed by us. Charging for it is a killer (Section 07) - and more practically, the shadow run is how the product proves schedule accuracy, so the cost belongs in sales, not in the invoice.</p>
     </section>
     <div class="divider"></div>
 
@@ -824,7 +834,7 @@
 
       <div class="section-label">What happens if the wedge flips</div>
       <ul class="clean">
-          <li><b>If allocation judgment dominates in discovery</b> <span class="weak">the partner-for-SSP plan breaks - we outsourced the capability buyers actually want. Named candidates to evaluate before the gate: license an established allocation engine, or reopen the acquisition question above.</span></li>
+          <li><b>If allocation judgment dominates in discovery</b> <span class="weak">the partner-for-SSP plan breaks - we outsourced the capability buyers actually want. Named candidates: license from RightRev or Leapfin, evaluate Trullion, or reopen the acquisition question above. Licensing from a competitor is uncomfortable but faster than building; price the relationship accordingly.</span></li>
           <li><b>IFRS 16 / ASC 842 (leases) are out of v1 scope entirely</b> <span class="weak">different buyer, different recognition logic, different audit trail. Not in the corpus, not in the roadmap.</span></li>
       </ul>
 
@@ -832,7 +842,11 @@
       <div class="table-wrap table-wrap-stack">
         <table class="rows table-stack">
           <tr><th>Line</th><th>Year 1</th><th>Year 2</th><th>Year 3</th></tr>
-          <tr><td data-label="Line"><b>Customers</b></td><td>8</td><td>35</td><td>90</td></tr>
+          <tr><td data-label="Line"><b>Starting customers</b></td><td>0</td><td>8</td><td>35</td></tr>
+          <tr><td data-label="Line"><b>New logos</b></td><td>8</td><td>28</td><td>58</td></tr>
+          <tr><td data-label="Line"><b>Churned</b><br><span class="who">92% logo retention</span></td><td>0</td><td>-1</td><td>-3</td></tr>
+          <tr><td data-label="Line"><b>Ending customers</b></td><td><b>8</b></td><td><b>35</b></td><td><b>90</b></td></tr>
+          <tr><td data-label="Line"><b>Net revenue retention</b></td><td>n/a</td><td>108%</td><td>112%</td></tr>
           <tr><td data-label="Line"><b>ARR</b></td><td>$0.6M</td><td>$3.0M</td><td>$8.0M</td></tr>
           <tr><td data-label="Line"><b>Cost to serve</b></td><td>$0.8M<br><span class="who">services-led, negative margin</span></td><td>$0.9M<br><span class="who">RAG onboarding lands</span></td><td>$1.6M<br><span class="who">mostly self-serve</span></td></tr>
           <tr><td data-label="Line"><b>Gross margin</b></td><td>-33%</td><td>70%</td><td>80%</td></tr>
@@ -844,8 +858,8 @@
       </div>
       <ul class="clean">
           <li><b>Peak cash need is roughly $5M, in year 2.</b> <span class="weak">Contribution turns positive in year 3. Payback on the total investment lands in year 4-5 if the ARR ladder holds.</span></li>
-          <li><b>CAC and payback:</b> <span class="weak">at $90K blended ACV and a 6-12 month enterprise cycle, fully-loaded CAC is $100-140K. That is a 16-20 month payback at year-3 margins - acceptable for infrastructure, but only if retention holds.</span></li>
-          <li><b>Retention assumption: 92% logo retention.</b> <span class="weak">Revenue subledgers are sticky because switching means re-validating every schedule with your auditor. That assumption is doing real work in this model and should be the first thing tested against comparable point solutions.</span></li>
+          <li><b>CAC and payback, derived from the S&amp;M line above.</b> <span class="weak">Year 3 spends $3.0M to land 58 new logos: $52K sales-and-marketing CAC, or roughly $70K fully loaded once onboarding is allocated. Against $90K ACV at 80% gross margin, that is a 12-month payback. Year 2 is worse ($64K CAC on 28 logos) because the motion is still services-led - the improvement is the whole argument for RAG onboarding.</span></li>
+          <li><b>Retention: 92% logo, 108-112% net revenue.</b> <span class="weak">Subledgers are sticky because switching means re-validating every schedule with your auditor. Expansion comes from the customer's own recognized revenue growing and from added entities and books - which is the strongest argument for pricing off recognized revenue in the first place. Both assumptions are doing real work here and should be the first thing tested against comparable point solutions.</span></li>
           <li><b>Year 1 gross margin is deliberately negative.</b> <span class="weak">Services-led pilots cost more than they bill. That is the price of proving the model - and it is exactly why RAG-assisted onboarding is a GTM lever rather than a feature: it is what bends the margin curve in year 2.</span></li>
       </ul>
 
@@ -862,7 +876,7 @@
     <div class="divider"></div>
 
     <!-- 11 -->
-    <section class="slide" id="ai" data-title="Applied AI &amp; Evals">
+    <section class="slide" id="ai" data-title="Applied AI">
       <div class="eyebrow">10 &middot; Applied AI</div>
       <h2 class="title">Let the model find the exceptions. Let the controller decide.</h2>
       <p class="lede">Revenue recognition has a right answer, and the cost of getting it wrong is a restatement. Judgment stays with the controller. The model's job is narrower and more valuable: scan every contract event for discrepancies, surface the ones that need human attention, and store the reasoning so that when an auditor asks "why?" six months later, the answer takes seconds instead of days.</p>
@@ -1017,7 +1031,7 @@
     <div class="divider"></div>
 
     <!-- 10 -->
-    <section class="slide" id="gtm" data-title="GTM">
+    <section class="slide" id="gtm" data-title="Go-to-Market">
       <div class="eyebrow">11 &middot; Go-to-Market</div>
       <h2 class="title">Land mid-market. Point at Salesforce. Don't start there.</h2>
       <p class="lede">Salesforce is the right north star and the wrong first customer. The ICP that gets this product proven is the segment that's outgrown Stripe RevRec but isn't ready for a multi-year Zuora implementation.</p>
@@ -1072,7 +1086,7 @@
     <div class="divider"></div>
 
     <!-- 12 -->
-    <section class="slide" id="metrics" data-title="Metrics">
+    <section class="slide" id="metrics" data-title="Measurement">
       <div class="eyebrow">13 &middot; Measurement</div>
       <h2 class="title">Four layers, and an honest note on lag</h2>
       <div class="section-label">Merchant outcome</div>
@@ -1104,17 +1118,17 @@
 
     <!-- 13 -->
     <section class="slide" id="close" data-title="The First 90 Days">
-      <div class="eyebrow">14 &middot; Close</div>
+      <div class="eyebrow">14 &middot; The First 90 Days</div>
       <h2 class="title">What I'd actually do in the first 90 days</h2>
       <div class="steps">
         <div class="step"><div class="n">1</div><div><h5>Weeks 1-3 &middot; Desk research first</h5><p>Mine Recurly's own lost-deal notes, support tickets, and CRM loss reasons before spending executive calendar. Add public signal: G2 reviews, Zuora and Maxio churn indicators, revenue accountant job postings. Pre-qualifies the buyer interviews and sharpens the question set.</p></div></div>
         <div class="step"><div class="n">2</div><div><h5>Weeks 2-6 &middot; Discovery interviews</h5><p>20 buyer interviews across the five cohorts in Section 06, plus 3 auditors on a separate track. Output: ranked exception taxonomy, trigger-event pattern, and existing-spend evidence.</p></div></div>
-        <div class="step"><div class="n">3</div><div><h5>Week 6 &middot; Decision gate</h5><p><b>Go criterion:</b> at least 12 of 20 buyers name contract-change propagation as their top pain source, and at least 8 have existing spend. <b>No-go:</b> allocation judgment dominates, or no existing budgets found - thesis flips or full stop. Decision made with Priya and VP Product before any engineering begins.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h5>Week 6 &middot; Decision gate</h5><p><b>Go criterion:</b> at least 12 of 20 buyers name contract-change propagation as their top pain source, and at least 8 have existing spend. <b>No-go:</b> allocation judgment dominates, or no existing budgets found - thesis flips or full stop. Decision made with the CPO and VP Product before any engineering begins.</p></div></div>
         <div class="step"><div class="n">4</div><div><h5>Weeks 6-10 &middot; WTP instruments + ingestion spec</h5><p>Run Van Westendorp and conjoint against the buyer cohort in parallel with Engineering speccing the public ingestion contract. Output: monetization model, price band, and API schema before the roadmap locks.</p></div></div>
         <div class="step"><div class="n">5</div><div><h5>Weeks 10-14 &middot; Services-led pilot</h5><p>First design-partner pilot is manually services-led: a solutions engineer runs real historical contracts through the recognition logic by hand, validating accuracy before the ingestion API exists. Proves the model without betting the timeline on engineering. Same contracts seed the AI eval golden set.</p></div></div>
       </div>
       <div class="callout" style="margin-top:28px;">
-        <b>The ask.</b> One quarter of discovery funding ($150-200K: researcher time, buyer incentives, conjoint tooling), a solutions engineer for the services-led pilot, and a named go/no-go decision at week 6 with Priya and VP Product. If the gate clears: a dedicated product pod (1 PM, 2 engineers, 1 designer) with a standalone P&L and a Q3 launch target for the mid-market ICP.
+        <b>The ask.</b> One quarter of discovery funding ($150-200K: researcher time, buyer incentives, conjoint tooling), a solutions engineer for the services-led pilot, and a named go/no-go decision at week 6 with the CPO and VP Product. If the gate clears: a dedicated pod of 1 PM, 5 engineers, 1 designer, and 1 solutions architect, on a standalone P&L, with SOC 1 Type II budgeted from day one. Peak cash need is roughly $5M across three years, turning contribution positive in year 3.
       </div>
       <div class="close-line">Recurly doesn't need to beat Zuora at Zuora's game. It needs to be the subledger that gets the lifecycle event right - for revenue it doesn't bill today, starting with the customers who've already outgrown the commodity option.</div>
     </section>
