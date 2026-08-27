@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revenue Recognition, Unbundled - RevRec as a Standalone B2B Service</title>
+<meta name="description" content="A case study on unbundling Recurly RevRec into a standalone, source-agnostic revenue subledger for B2B contract businesses.">
+<style>
+  :root{
+    --cream:#FDF9F0;
+    --cream-deep:#F7EFE0;
+    --panel:#FCF0DA;
+    --card:#FFFFFF;
+    --border:#F0E6D4;
+    --border-soft:#F5EEE1;
+
+    --amber:#F5A623;
+    --amber-deep:#D97A06;
+    --amber-soft:#FDEBC8;
+    --peach:#E8896A;
+    --peach-soft:#FBE4DA;
+
+    --ink:#2E2A24;
+    --slate:#6B6459;
+    --slate-lo:#9C948A;
+    --good:#3F7A52;
+    --warn:#C2542A;
+
+    --r-sm:10px;
+    --r:14px;
+    --r-lg:20px;
+    --shadow:0 1px 2px rgba(46,42,36,0.04);
+  }
+  *{box-sizing:border-box;}
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; padding:0;
+    font-family:'Inter',ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--cream); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .num{font-variant-numeric:tabular-nums;}
+
+  /* ---------- Mobile top bar ---------- */
+  .topbar{
+    display:none;
+    position:sticky; top:0; z-index:20;
+    background:var(--cream); border-bottom:1px solid var(--border);
+    padding:12px 18px; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .brandmark{ display:flex; align-items:center; gap:9px; font-weight:800; font-size:15px; letter-spacing:-0.01em; }
+  .brandmark .badge{
+    width:26px; height:26px; border-radius:8px; background:var(--amber);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:800; font-size:14px;
+  }
+  .topbar select{
+    background:var(--card); color:var(--ink); border:1px solid var(--border); border-radius:9px;
+    padding:7px 9px; font-size:12.5px; font-family:inherit; max-width:52%;
+  }
+
+  .layout{ display:flex; max-width:1300px; margin:0 auto; }
+
+  /* ---------- Rail ---------- */
+  .rail{
+    width:262px; flex-shrink:0;
+    position:sticky; top:0; align-self:flex-start; height:100vh;
+    background:var(--cream-deep); border-right:1px solid var(--border);
+    display:flex; flex-direction:column; padding:30px 0 20px;
+  }
+  .rail-brand{ padding:0 22px 20px; border-bottom:1px solid var(--border); margin-bottom:12px; }
+  .rail-brand .sub{ font-size:11.5px; color:var(--slate-lo); margin-top:9px; line-height:1.5; }
+  .rail-nav{ flex:1; overflow-y:auto; padding:4px 12px; }
+  .rail-item{
+    display:flex; align-items:baseline; gap:11px;
+    padding:8px 12px; border-radius:9px; text-decoration:none;
+    font-size:13px; color:var(--slate); line-height:1.35;
+    transition:background .15s ease, color .15s ease;
+  }
+  .rail-item .n{ font-size:10.5px; font-weight:700; color:var(--slate-lo); width:16px; flex-shrink:0; }
+  .rail-item:hover{ background:rgba(245,166,35,0.10); color:var(--ink); }
+  .rail-item.active{ background:var(--amber-soft); color:#8A5200; font-weight:700; }
+  .rail-item.active .n{ color:var(--amber-deep); }
+  .rail-foot{ padding:16px 22px 0; border-top:1px solid var(--border); font-size:11px; color:var(--slate-lo); line-height:1.5; }
+
+  main{ flex:1; min-width:0; }
+  .progress-outer{ position:sticky; top:0; height:3px; background:var(--border-soft); z-index:15; }
+  .progress-bar{ height:100%; background:var(--amber); width:0%; }
+
+  section.slide{ max-width:800px; margin:0 auto; padding:60px 48px 56px; scroll-margin-top:10px; }
+
+  /* ---------- Type ---------- */
+  .eyebrow{
+    font-size:11.5px; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--amber-deep); margin-bottom:10px;
+  }
+  h1.title{ font-size:38px; line-height:1.1; letter-spacing:-0.025em; font-weight:800; margin:0 0 14px; }
+  h2.title{ font-size:29px; line-height:1.18; letter-spacing:-0.02em; font-weight:800; margin:0 0 14px; }
+  .lede{ font-size:16.5px; line-height:1.65; color:var(--slate); max-width:660px; margin:0 0 28px; }
+  p.body{ font-size:14.5px; line-height:1.65; color:var(--ink); max-width:660px; }
+  p.fine{ font-size:13.5px; line-height:1.6; color:var(--slate); max-width:660px; }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--panel); border-radius:var(--r-lg); padding:34px 36px 36px; margin-bottom:26px;
+  }
+  .hero .brandmark{ margin-bottom:18px; font-size:19px; }
+  .hero .brandmark .badge{ width:32px; height:32px; border-radius:9px; font-size:16px; }
+  .hero h1{ margin-bottom:12px; }
+  .hero .sub{ font-size:16px; color:var(--slate); line-height:1.6; margin:0; max-width:620px; }
+
+  /* ---------- Stat cards ---------- */
+  .stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:24px 0; }
+  .stat{
+    background:var(--card); border:1px solid var(--border); border-top:6px solid var(--amber);
+    border-radius:var(--r); padding:15px 17px 17px; box-shadow:var(--shadow);
+  }
+  .stat .l{ font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--slate-lo); margin-bottom:7px; }
+  .stat .v{ font-size:26px; font-weight:800; letter-spacing:-0.025em; line-height:1.05; }
+  .stat .d{ font-size:12px; color:var(--slate); margin-top:6px; line-height:1.4; }
+  .stat .d.up{ color:var(--amber-deep); font-weight:600; }
+
+  /* ---------- Cards ---------- */
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0; }
+  .grid3{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:20px 0; }
+  .card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    padding:19px 21px; box-shadow:var(--shadow);
+  }
+  .card h4{ margin:0 0 7px; font-size:14.5px; font-weight:700; }
+  .card p{ margin:0; font-size:13.8px; color:var(--slate); line-height:1.6; }
+  .card.tint{ background:var(--panel); border-color:#F2DFBC; box-shadow:none; }
+  .card.deep{ background:var(--cream-deep); border-color:var(--border); box-shadow:none; }
+
+  .panel{
+    background:var(--panel); border-radius:var(--r-lg); padding:26px 30px; margin:24px 0;
+  }
+  .panel h3{ margin:0 0 16px; font-size:20px; font-weight:800; letter-spacing:-0.015em; }
+  .panel .cols{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  .panel .cols .k{ font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--amber-deep); margin-bottom:6px; }
+  .panel .cols .v{ font-size:19px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; line-height:1.2; }
+  .panel .cols .n{ font-size:13px; color:var(--slate); line-height:1.55; }
+
+  /* ---------- Lists ---------- */
+  ul.clean{ margin:0; padding:0; list-style:none; }
+  ul.clean li{ position:relative; padding-left:19px; margin-bottom:11px; font-size:14.5px; line-height:1.6; color:var(--ink); }
+  ul.clean li::before{ content:''; position:absolute; left:0; top:8px; width:7px; height:7px; border-radius:50%; background:var(--amber); }
+  ul.clean li b{ font-weight:700; }
+  ul.clean li .weak{ color:var(--slate); }
+
+  ul.ask{ margin:0; padding:0; list-style:none; }
+  ul.ask li{ font-size:13.8px; line-height:1.6; margin-bottom:9px; padding-left:20px; position:relative; color:var(--ink); }
+  ul.ask li::before{ content:'?'; position:absolute; left:0; top:0; font-weight:800; color:var(--amber-deep); }
+
+  ul.no{ margin:0; padding:0; list-style:none; }
+  ul.no li{ font-size:13.8px; line-height:1.6; margin-bottom:9px; padding-left:20px; position:relative; color:var(--ink); }
+  ul.no li::before{ content:'\00d7'; position:absolute; left:1px; top:-1px; font-weight:800; color:var(--warn); font-size:15px; }
+
+  /* ---------- Numbered steps ---------- */
+  .steps{ margin:20px 0; }
+  .step{
+    display:flex; gap:14px; align-items:flex-start;
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    padding:14px 18px; margin-bottom:9px; box-shadow:var(--shadow);
+  }
+  .step .n{
+    width:28px; height:28px; border-radius:50%; background:var(--amber-soft); color:#A65C00;
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px; flex-shrink:0; margin-top:1px;
+  }
+  .step h5{ margin:0 0 3px; font-size:14.5px; font-weight:700; }
+  .step p{ margin:0; font-size:13.5px; color:var(--slate); line-height:1.55; }
+
+  /* ---------- Postures ---------- */
+  .posture{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+    padding:15px 18px; margin-bottom:10px; box-shadow:var(--shadow);
+    border-left:4px solid var(--amber);
+  }
+  .posture h5{ margin:0 0 4px; font-size:14px; font-weight:700; }
+  .posture p{ margin:0; font-size:13.5px; color:var(--slate); line-height:1.55; }
+
+  /* ---------- Tables ---------- */
+  .table-wrap{ background:var(--card); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; margin:20px 0; box-shadow:var(--shadow); }
+  table.rows{ width:100%; border-collapse:collapse; }
+  table.rows th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--slate); font-weight:800; padding:12px 16px; background:var(--panel);
+  }
+  table.rows td{ font-size:13.5px; padding:13px 16px; border-top:1px solid var(--border-soft); vertical-align:top; color:var(--ink); line-height:1.5; }
+  table.rows td b{ font-weight:700; }
+  .who{ color:var(--slate-lo); font-size:12px; font-weight:500; }
+
+  .pill{ display:inline-block; font-size:10.5px; font-weight:800; padding:3px 10px; border-radius:20px; white-space:nowrap; }
+  .pill.own{ background:var(--amber-soft); color:#A65C00; }
+  .pill.partner{ background:#EFEAE1; color:var(--slate); }
+  .pill.leader{ background:var(--amber-soft); color:#A65C00; }
+  .pill.filler{ background:#EFEAE1; color:var(--slate); }
+  .pill.killer{ background:var(--peach-soft); color:var(--warn); }
+
+  /* ---------- Accents ---------- */
+  .quote{
+    font-size:15.5px; color:var(--ink); border-left:4px solid var(--amber);
+    padding:6px 0 6px 18px; margin:20px 0; line-height:1.6; font-style:italic;
+  }
+  .callout{
+    background:var(--panel); border-radius:var(--r); padding:19px 22px; margin:22px 0;
+    font-size:14.5px; line-height:1.65;
+  }
+  .callout b{ font-weight:800; }
+  .thesis-box{
+    background:var(--ink); color:#FDF9F0; border-radius:var(--r-lg);
+    padding:26px 30px; margin:22px 0 6px; font-size:19px; line-height:1.55; font-weight:600; letter-spacing:-0.01em;
+  }
+  .thesis-box .tag{ color:var(--amber); font-weight:800; }
+  .close-line{ font-size:21px; font-weight:800; line-height:1.45; margin-top:24px; letter-spacing:-0.015em; }
+
+  .chart-card{ background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:22px 24px; margin:20px 0; box-shadow:var(--shadow); }
+  .chart-card .ct{ font-size:17px; font-weight:800; letter-spacing:-0.015em; margin:0 0 3px; }
+  .chart-card .cs{ font-size:13px; color:var(--slate); margin:0 0 14px; }
+  .map-caption{ font-size:12px; color:var(--slate-lo); margin-top:10px; text-align:center; }
+
+  .section-label{ font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--slate-lo); margin:28px 0 12px; }
+
+  .divider{ height:1px; background:var(--border); max-width:800px; margin:0 auto; }
+
+  footer{
+    max-width:800px; margin:0 auto; padding:30px 48px 70px;
+    font-size:12px; color:var(--slate-lo); line-height:1.6;
+    display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;
+  }
+
+  @media (max-width:940px){
+    .rail{ display:none; }
+    .topbar{ display:flex; }
+    section.slide{ padding:38px 20px 40px; }
+    footer{ padding:22px 20px 50px; }
+    .grid2, .grid3, .panel .cols{ grid-template-columns:1fr; }
+    .stat-row{ grid-template-columns:1fr 1fr; }
+    h1.title{ font-size:28px; }
+    h2.title{ font-size:23px; }
+    .hero{ padding:24px 22px 26px; }
+    .panel{ padding:22px 20px; }
+    .table-wrap{ overflow-x:auto; }
+    table.rows{ min-width:560px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brandmark"><span class="badge">R</span>RevRec, Unbundled</div>
+  <select id="mobileNav" onchange="location.hash=this.value;"></select>
+</div>
+
+<div class="progress-outer"><div class="progress-bar" id="progressBar"></div></div>
+
+<div class="layout">
+
+  <nav class="rail">
+    <div class="rail-brand">
+      <div class="brandmark"><span class="badge">R</span>RevRec, Unbundled</div>
+      <div class="sub">Case study &middot; final round with Priya<br>Prepared by Jen Deepa</div>
+    </div>
+    <div class="rail-nav" id="railNav"></div>
+    <div class="rail-foot">A standalone RevRec service for B2B contract businesses.</div>
+  </nav>
+
+  <main id="viewport">
+
+    <!-- 01 -->
+    <section class="slide" id="thesis" data-title="Thesis">
+      <div class="hero">
+        <div class="brandmark"><span class="badge">R</span>RevRec, Unbundled</div>
+        <div class="eyebrow">Revenue recognition &middot; Case study &middot; Standalone service</div>
+        <h1 class="title">Recognize revenue you don't bill.</h1>
+        <p class="sub">Recurly RevRec is excellent at recognizing revenue Recurly bills. It has nothing to say about revenue that never touches Recurly's billing engine - which is most B2B contract revenue, including businesses shaped like Salesforce.</p>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat">
+          <div class="l">Scope</div>
+          <div class="v num">14</div>
+          <div class="d">sections, discovery through GTM</div>
+        </div>
+        <div class="stat">
+          <div class="l">Discovery plan</div>
+          <div class="v num">20</div>
+          <div class="d">interviews before a line of code</div>
+        </div>
+        <div class="stat">
+          <div class="l">Competitors</div>
+          <div class="v num">5</div>
+          <div class="d up">postures, not feature lists</div>
+        </div>
+        <div class="stat">
+          <div class="l">AI use cases</div>
+          <div class="v num">3</div>
+          <div class="d up">ranked by risk, not by hype</div>
+        </div>
+      </div>
+
+      <div class="thesis-box">
+        <span class="tag">The bet:</span> decouple RevRec from Recurly Subscriptions and sell it as a source-agnostic revenue subledger for B2B contract businesses - competing on lifecycle-event accuracy, not on out-Zuora-ing Zuora's contract depth.
+      </div>
+
+      <div class="section-label">What this covers</div>
+      <p class="fine">Customer discovery, competitive position, willingness to pay, technical feasibility, applied AI and evals, and go-to-market. The anchor customer shape throughout is Salesforce-like: multi-year, multi-element, usage-inclusive contracts. Built to be argued with, not read.</p>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 02 -->
+    <section class="slide" id="the-gap" data-title="The Gap">
+      <div class="eyebrow">02 &middot; The Gap</div>
+      <h2 class="title">Two customer bases Recurly can't see today</h2>
+      <p class="lede">RevRec today is a feature of Recurly Subscriptions. If a contract's billing event doesn't originate inside Recurly, RevRec never learns about it - regardless of how large or strategically important that customer is.</p>
+      <div class="grid2">
+        <div class="card">
+          <h4>B2B SaaS with its own billing stack</h4>
+          <p>Companies that run CPQ and invoicing through Salesforce, NetSuite, or a homegrown system. Multi-element arrangements - license plus services plus usage - are exactly where manual SSP allocation breaks down.</p>
+        </div>
+        <div class="card">
+          <h4>Multi-source revenue businesses</h4>
+          <p>Merchants whose revenue lands in more than one system - Stripe here, a marketplace there, an ERP everywhere else. A billing-coupled RevRec sees one slice and calls it complete.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <b>The trust stake.</b> A finance team that can't close the books on schedule loses credibility with the board before it loses anything else. That escalation path runs to the CFO regardless of whose platform is upstream - which means the market for "gets the schedule right" is bigger than the market for "bills the transaction."
+      </div>
+    </section>
+    <div class="divider"></div>
+
+
+    <!-- 03 -->
+    <section class="slide" id="current-journey" data-title="Current Journey">
+      <div class="eyebrow">03 · Current State</div>
+      <h2 class="title">The close today, mapped end to end</h2>
+      <p class="lede">Before proposing what to build, it helps to walk the current journey honestly. Every box below is a real step a revenue accountant performs today. The ones highlighted in amber are where the process breaks.</p>
+
+      <div class="chart-card">
+        <p class="ct">Current-state revenue recognition journey</p>
+        <p class="cs">From contract execution through audit inquiry. Amber highlights are friction points.</p>
+        <svg viewBox="0 0 720 520" width="100%" style="max-height:520px;">
+          <defs>
+            <marker id="aj" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#C4B9A6"/>
+            </marker>
+          </defs>
+
+          <!-- Row labels -->
+          <text x="6" y="30" font-size="10" font-weight="800" fill="#9C948A" letter-spacing="0.06em">CONTRACT EXECUTION</text>
+          <text x="6" y="130" font-size="10" font-weight="800" fill="#9C948A" letter-spacing="0.06em">INITIAL SETUP</text>
+          <text x="6" y="250" font-size="10" font-weight="800" fill="#9C948A" letter-spacing="0.06em">MONTHLY CLOSE</text>
+          <text x="6" y="380" font-size="10" font-weight="800" fill="#9C948A" letter-spacing="0.06em">MID-TERM CHANGES</text>
+          <text x="6" y="476" font-size="10" font-weight="800" fill="#9C948A" letter-spacing="0.06em">AUDIT INQUIRY</text>
+
+          <!-- Row 1: Contract execution -->
+          <rect x="6" y="40" width="150" height="50" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="18" y="62" font-size="11" font-weight="700" fill="#2E2A24">Deal closes in CRM</text>
+          <text x="18" y="76" font-size="10" fill="#6B6459">Salesforce, HubSpot, CPQ</text>
+
+          <line x1="160" y1="65" x2="186" y2="65" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="192" y="40" width="162" height="50" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="204" y="62" font-size="11" font-weight="700" fill="#2E2A24">Invoice created</text>
+          <text x="204" y="76" font-size="10" fill="#6B6459">Billing system or ERP</text>
+
+          <line x1="358" y1="65" x2="384" y2="65" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="390" y="40" width="168" height="50" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="402" y="62" font-size="11" font-weight="700" fill="#2E2A24">Manual handoff to Finance</text>
+          <text x="402" y="76" font-size="10" fill="#6B6459">Email, Slack, or shared drive</text>
+
+          <!-- Row 2: Initial setup -->
+          <rect x="6" y="140" width="162" height="58" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="18" y="160" font-size="11" font-weight="700" fill="#2E2A24">Identify perf. obligations</text>
+          <text x="18" y="174" font-size="10" fill="#6B6459">Read the contract, reference</text>
+          <text x="18" y="186" font-size="10" fill="#6B6459">ASC 606 / IFRS 15 manually</text>
+
+          <line x1="172" y1="169" x2="198" y2="169" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="204" y="140" width="162" height="58" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="216" y="160" font-size="11" font-weight="700" fill="#2E2A24">Allocate SSP</text>
+          <text x="216" y="174" font-size="10" fill="#6B6459">Spreadsheet, often copy-pasted</text>
+          <text x="216" y="186" font-size="10" fill="#6B6459">from a prior deal</text>
+
+          <line x1="370" y1="169" x2="396" y2="169" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="402" y="140" width="162" height="58" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="414" y="160" font-size="11" font-weight="700" fill="#2E2A24">Build schedule</text>
+          <text x="414" y="174" font-size="10" fill="#6B6459">Tab per contract in a</text>
+          <text x="414" y="186" font-size="10" fill="#6B6459">master workbook</text>
+
+          <line x1="568" y1="169" x2="594" y2="169" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="600" y="140" width="112" height="58" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="612" y="164" font-size="11" font-weight="700" fill="#2E2A24">Post opening</text>
+          <text x="612" y="178" font-size="11" font-weight="700" fill="#2E2A24">JE to GL</text>
+
+          <!-- Row 3: Monthly close -->
+          <rect x="6" y="260" width="150" height="58" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="18" y="280" font-size="11" font-weight="700" fill="#2E2A24">Pull billing data</text>
+          <text x="18" y="294" font-size="10" fill="#6B6459">From each source system,</text>
+          <text x="18" y="306" font-size="10" fill="#6B6459">often multiple exports</text>
+
+          <line x1="160" y1="289" x2="186" y2="289" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="192" y="260" width="162" height="58" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="204" y="280" font-size="11" font-weight="700" fill="#2E2A24">Reconcile to schedule</text>
+          <text x="204" y="294" font-size="10" fill="#6B6459">Compare billed vs. recognized,</text>
+          <text x="204" y="306" font-size="10" fill="#6B6459">hunt for variances</text>
+
+          <line x1="358" y1="289" x2="384" y2="289" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="390" y="260" width="162" height="58" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="402" y="280" font-size="11" font-weight="700" fill="#2E2A24">Manual journal entries</text>
+          <text x="402" y="294" font-size="10" fill="#6B6459">Correct each variance by</text>
+          <text x="402" y="306" font-size="10" fill="#6B6459">hand, then cross-check</text>
+
+          <line x1="556" y1="289" x2="582" y2="289" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="588" y="260" width="124" height="58" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="600" y="280" font-size="11" font-weight="700" fill="#2E2A24">Close the period</text>
+          <text x="600" y="294" font-size="10" fill="#6B6459">Sign off, lock the</text>
+          <text x="600" y="306" font-size="10" fill="#6B6459">subledger</text>
+
+          <!-- Row 4: Mid-term changes -->
+          <rect x="6" y="390" width="150" height="50" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="18" y="410" font-size="11" font-weight="700" fill="#2E2A24">Contract modified</text>
+          <text x="18" y="424" font-size="10" fill="#6B6459">Upsell, downgrade, renewal</text>
+
+          <line x1="160" y1="415" x2="186" y2="415" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="192" y="390" width="172" height="50" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="204" y="410" font-size="11" font-weight="700" fill="#2E2A24">Re-allocate remaining value</text>
+          <text x="204" y="424" font-size="10" fill="#6B6459">New spreadsheet version, new tabs</text>
+
+          <line x1="368" y1="415" x2="394" y2="415" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="400" y="390" width="162" height="50" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="412" y="410" font-size="11" font-weight="700" fill="#2E2A24">Hope nothing was missed</text>
+          <text x="412" y="424" font-size="10" fill="#6B6459">No systematic check exists</text>
+
+          <!-- Row 5: Audit inquiry -->
+          <rect x="6" y="486" width="174" height="50" rx="10" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="18" y="506" font-size="11" font-weight="700" fill="#2E2A24">Auditor asks: "why was</text>
+          <text x="18" y="520" font-size="11" font-weight="700" fill="#2E2A24">this recognized this way?"</text>
+
+          <line x1="184" y1="511" x2="210" y2="511" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="216" y="486" width="188" height="50" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="228" y="506" font-size="11" font-weight="700" fill="#2E2A24">Dig through email, Slack,</text>
+          <text x="228" y="520" font-size="11" font-weight="700" fill="#2E2A24">and spreadsheet versions</text>
+
+          <line x1="408" y1="511" x2="434" y2="511" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#aj)"/>
+
+          <rect x="440" y="486" width="196" height="50" rx="10" fill="#FCF0DA" stroke="#F5A623" stroke-width="2"/>
+          <text x="452" y="506" font-size="11" font-weight="700" fill="#2E2A24">Reconstruct the reasoning</text>
+          <text x="452" y="520" font-size="10" fill="#6B6459">Often from memory, weeks later</text>
+        </svg>
+      </div>
+
+      <div class="panel">
+        <h3>Where the hours go</h3>
+        <div class="cols">
+          <div>
+            <div class="k">Setup</div>
+            <div class="v">2-4 hrs / contract</div>
+            <div class="n">Reading the contract, identifying obligations, building the allocation spreadsheet. Repeated from scratch on every new deal.</div>
+          </div>
+          <div>
+            <div class="k">Monthly close</div>
+            <div class="v">3-8 days</div>
+            <div class="n">Pulling data from each source, reconciling to the schedule, creating manual journal entries, chasing down variances.</div>
+          </div>
+          <div>
+            <div class="k">Audit prep</div>
+            <div class="v">Weeks of rework</div>
+            <div class="n">Reconstructing the reasoning behind decisions made months ago from email threads, Slack messages, and spreadsheet version history.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>The pattern worth noticing.</b> Every amber box shares a trait: it is either a manual translation of structured data from one system to another, or a reasoning step whose rationale is never recorded. The first is an ingestion problem. The second is an evidence problem. A standalone RevRec needs to solve both.
+      </div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 04 -->
+    <section class="slide" id="landscape" data-title="Landscape">
+      <div class="eyebrow">04 &middot; Competitive Landscape</div>
+      <h2 class="title">Five postures, not five feature lists</h2>
+      <p class="lede">Knowing which posture a competitor has chosen says more than knowing their feature set - it says where Recurly should and shouldn't compete.</p>
+      <div class="posture"><h5>Zuora - the deep engine, decoupled from the ERP</h5><p>Enterprise benchmark for contract complexity. Keeps recognition logic out of the ERP entirely, preserving GL governance and SOX-grade audit trails. Wins on depth; a decade of head start.</p></div>
+      <div class="posture"><h5>Stripe - commoditize it as an attach product</h5><p>0.25% of recognized revenue, no upfront cost - priced to be a rounding error next to processing fees. Technically shallow: treats invoices, not contracts, as the recognition driver.</p></div>
+      <div class="posture"><h5>Chargebee - monetization complexity as the wedge</h5><p>Every pricing innovation (usage, credits, ramps) becomes a recognition obligation Finance wasn't built for. RevRec is one of seven bundled modules.</p></div>
+      <div class="posture"><h5>Maxio - vertical specialist, deliberately narrow</h5><p>Purpose-built for $1M–$100M ARR B2B software. Proof that a narrow ICP is defensible even against much larger platforms.</p></div>
+      <div class="posture"><h5>The unbundlers - RightRev, Leapfin, LedgerUp, Ordway</h5><p>Plug into whatever billing exists; aggregate every revenue source into one governed subledger. The real structural threat, since merchants rarely have all revenue in one place.</p></div>
+
+      <div class="chart-card">
+        <p class="ct">Where the wedge sits</p>
+        <p class="cs">Contract complexity against coupling to a single billing system</p>
+        <svg viewBox="0 0 640 350" width="100%" style="max-height:340px;">
+          <line x1="62" y1="16" x2="62" y2="312" stroke="#EADFC9" stroke-width="1.5"/>
+          <line x1="62" y1="312" x2="600" y2="312" stroke="#EADFC9" stroke-width="1.5"/>
+          <text x="62" y="332" font-size="10.5" fill="#9C948A">Coupled to one billing system</text>
+          <text x="452" y="332" font-size="10.5" fill="#9C948A">Source-agnostic subledger</text>
+          <text x="14" y="24" font-size="10.5" fill="#9C948A" transform="rotate(-90 14 24)">Complex contracts</text>
+          <text x="14" y="304" font-size="10.5" fill="#9C948A" transform="rotate(-90 14 304)">Simple contracts</text>
+
+          <circle cx="140" cy="278" r="7" fill="#9C948A"/><text x="152" y="282" font-size="11" font-weight="600" fill="#2E2A24">Recurly RevRec (today)</text>
+          <circle cx="118" cy="294" r="7" fill="#E8896A"/><text x="130" y="298" font-size="11" font-weight="600" fill="#2E2A24">Stripe RevRec</text>
+          <circle cx="300" cy="226" r="7" fill="#9C948A"/><text x="312" y="230" font-size="11" font-weight="600" fill="#2E2A24">Chargebee</text>
+          <circle cx="180" cy="178" r="7" fill="#9C948A"/><text x="192" y="182" font-size="11" font-weight="600" fill="#2E2A24">Maxio</text>
+          <circle cx="482" cy="88" r="7" fill="#E8896A"/><text x="494" y="92" font-size="11" font-weight="600" fill="#2E2A24">Zuora Revenue</text>
+          <circle cx="470" cy="178" r="7" fill="#E8896A"/><text x="482" y="182" font-size="11" font-weight="600" fill="#2E2A24">Unbundlers</text>
+
+          <circle cx="330" cy="148" r="11" fill="#F5A623" stroke="#2E2A24" stroke-width="2"/>
+          <text x="348" y="143" font-size="11" font-weight="800" fill="#2E2A24">The wedge:</text>
+          <text x="348" y="157" font-size="11" font-weight="800" fill="#2E2A24">lifecycle-native,</text>
+          <text x="348" y="171" font-size="11" font-weight="800" fill="#2E2A24">source-agnostic</text>
+        </svg>
+        <div class="map-caption">Mid-complexity, source-agnostic, lifecycle-native - open ground between the unbundlers and Zuora.</div>
+      </div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 04 -->
+    <section class="slide" id="the-wedge" data-title="The Wedge">
+      <div class="eyebrow">05 &middot; Why Recurly, Why Now</div>
+      <h2 class="title">The differentiation isn't depth. It's lifecycle fidelity.</h2>
+      <p class="lede">Recurly won't out-allocate Zuora on SSP edge cases with a decade less experience. It doesn't need to. It already runs the one primitive every unbundler struggles with, at massive scale.</p>
+      <ul class="clean">
+        <li><b>Every upgrade, downgrade, pause, and cancellation</b> <span class="weak">already generates a schedule adjustment inside Recurly's engine - millions of times a day, for consumer subscriptions.</span></li>
+        <li><b>That's the hard part, not a side effect.</b> <span class="weak">LedgerUp's own positioning: most deferred-revenue errors originate in mismatched contract and billing data, not in the recognition logic itself.</span></li>
+        <li><b>The bet: generalize the lifecycle-to-schedule engine</b> <span class="weak">into an ingestion-agnostic layer. Compete on "gets the event right," not "handles every allocation edge case."</span></li>
+        <li><b>Recurly already has the playbook.</b> <span class="weak">Justt.ai (chargeback dispute management) shows Recurly owning the workflow and data layer while partnering for a specialized engine - the same shape applies here.</span></li>
+      </ul>
+      <div class="quote">Own what merchants judge you on and what compounds over time. Rent what's commodity infrastructure backed by network effects you could never replicate.</div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 05 -->
+    <section class="slide" id="worked-example" data-title="Worked Example">
+      <div class="eyebrow">06 &middot; Worked Example</div>
+      <h2 class="title">A Salesforce-shaped contract, walked through</h2>
+      <p class="lede">Not a claim that Salesforce is a day-one customer - a stand-in for the contract shape the standalone product has to handle: multi-year, multi-element, usage-inclusive.</p>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Contract event</th><th>What breaks today</th><th>The lifecycle-native fix</th></tr>
+          <tr><td><b>3-year deal</b><br><span class="who">license + implementation + usage overage</span></td><td>SSP allocation across three revenue streams done by hand in a spreadsheet</td><td>Contract ingested once; allocation schedule generated and versioned automatically</td></tr>
+          <tr><td><b>Mid-term seat change</b></td><td>Manual re-allocation across remaining periods; easy to get wrong, hard to audit</td><td>Treated as a lifecycle event - the same primitive Recurly runs for a $9.99 subscription, applied to a $2M contract</td></tr>
+          <tr><td><b>Multi-year renewal</b><br><span class="who">with new pricing</span></td><td>Prior schedule and new schedule reconciled manually at renewal</td><td>Renewal event chains to the prior schedule automatically, with a full audit trail</td></tr>
+        </table>
+      </div>
+      <div class="quote">The finance team doesn't need a smarter allocation engine. It needs every contract change to become a tracked event instead of a spreadsheet edit.</div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 06 -->
+    <section class="slide" id="discovery" data-title="Customer Discovery">
+      <div class="eyebrow">07 &middot; Customer Discovery</div>
+      <h2 class="title">Twenty interviews before a line of code</h2>
+      <p class="lede">Everything on the previous five sections is a hypothesis. This section is how it gets tested - who I'd talk to, what I'd actually be listening for, and what answer would tell me the thesis is wrong.</p>
+
+      <div class="section-label">Who to talk to, and what each one can actually tell you</div>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Who</th><th>What they know that nobody else does</th><th>What they can't tell you</th></tr>
+          <tr><td><b>Revenue accounting manager</b><br><span class="who">daily user</span></td><td>The exception taxonomy - exactly which contract events force a manual journal entry, and how often</td><td>Anything about budget or purchase authority</td></tr>
+          <tr><td><b>Controller</b><br><span class="who">process owner, likely champion</span></td><td>Close timeline, headcount on reconciliation, whether a budget line already exists</td><td>Whether the CFO will actually fund it</td></tr>
+          <tr><td><b>CFO / VP Finance</b><br><span class="who">economic buyer</span></td><td>What triggers a purchase, what this competes against for budget, what "worth it" means</td><td>Feature-level detail - don't ask them</td></tr>
+          <tr><td><b>RevOps / systems owner</b><br><span class="who">implementer, can veto</span></td><td>Whether the ingestion contract is buildable against their CPQ and ERP stack</td><td>Whether the pain is worth paying to solve</td></tr>
+          <tr><td><b>External auditor</b><br><span class="who">constraint setter, never a buyer</span></td><td>What evidence they will and won't accept - this defines the audit trail as a functional requirement, not a reporting nicety</td><td>Anything about the commercial case</td></tr>
+        </table>
+      </div>
+
+      <div class="section-label">Sample design - roughly 20 conversations</div>
+      <div class="grid3">
+        <div class="card"><h4>6 &middot; Still manual</h4><p>Spreadsheet-and-heroics close. Tests whether the pain is acute enough to fund a purchase at all.</p></div>
+        <div class="card"><h4>5 &middot; On a point solution</h4><p>RightRev, Leapfin, Ordway. Tests what the unbundlers get right and where they still leave gaps.</p></div>
+        <div class="card"><h4>4 &middot; Outgrowing Stripe</h4><p>The most likely first cohort. Tests whether "invoice-driven, not contract-driven" is a felt problem or a technical footnote.</p></div>
+        <div class="card"><h4>3 &middot; On Zuora, unhappy</h4><p>Tests whether depth is worth its implementation cost, and what a downgrade path looks like.</p></div>
+        <div class="card"><h4>2 &middot; Lost or churned</h4><p>Prospects who evaluated Recurly RevRec and chose otherwise. Highest-signal group and the one teams skip.</p></div>
+        <div class="card tint"><h4>Plus: 3 auditors</h4><p>Separate track, no commercial agenda. Purely to pin down the evidence standard.</p></div>
+      </div>
+
+      <div class="section-label">What I'd be looking for</div>
+      <ul class="clean">
+        <li><b>Artifacts, not adjectives.</b> <span class="weak">Ask them to screen-share the actual close checklist and the reconciliation workbook. Count the tabs, the manual journal entries, the people in the thread. "It's painful" is not data; a 40-tab workbook is.</span></li>
+        <li><b>Money already moving.</b> <span class="weak">Are they paying a contractor, a Big Four advisory team, or a point tool today? An existing budget line is proven willingness to pay and beats every stated intention.</span></li>
+        <li><b>The trigger event.</b> <span class="weak">Nobody buys revenue infrastructure on a quiet Tuesday. Look for the pattern: audit finding, restatement, IPO readiness, new CFO, ERP migration, or launching a new pricing model. The trigger determines the GTM motion.</span></li>
+        <li><b>The exception ranking.</b> <span class="weak">Which lifecycle events generate the most manual adjustments, ordered by volume. A direct roadmap input - and the seed for the eval set in Section 10.</span></li>
+        <li><b>Who signs, and what loses.</b> <span class="weak">Whose budget, what approval threshold, and what else that money would have gone to.</span></li>
+      </ul>
+
+      <div class="section-label">Questions I'd ask, and the ones I wouldn't</div>
+      <div class="grid2">
+        <div class="card">
+          <h4>Ask these</h4>
+          <ul class="ask">
+            <li>Walk me through last month's close, hour by hour, from cutoff to sign-off.</li>
+            <li>Show me the last five manual journal entries and tell me what caused each one.</li>
+            <li>The last time you evaluated a tool for this - what happened, and why did it end where it did?</li>
+            <li>What did your auditor push back on most recently?</li>
+            <li>If close took three days instead of ten, what would you personally do with the time?</li>
+          </ul>
+        </div>
+        <div class="card deep">
+          <h4>Never ask these</h4>
+          <ul class="no">
+            <li>"Would you buy this?" - everyone is polite in a discovery call.</li>
+            <li>"How much would you pay?" - an unanchored number is worse than no number.</li>
+            <li>"Would this feature be useful?" - everything is useful when it's free.</li>
+          </ul>
+          <p style="margin-top:11px; color:var(--slate); font-size:13px; line-height:1.55;">And don't demo first. A demo anchors the buyer and contaminates every willingness-to-pay answer that follows.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>The one question the whole thesis rests on.</b> When a revenue accountant ranks their sources of manual work, does contract-change propagation come out on top, or does SSP allocation judgment? If fewer than half name propagation, the lifecycle wedge is wrong and the build order flips toward allocation logic. I'd rather find that out in week three than in quarter three.
+      </div>
+
+      <div class="section-label">Kill criteria</div>
+      <ul class="clean">
+        <li><b>No existing spend.</b> <span class="weak">If nobody is already paying a human or a tool to solve this, the pain isn't budget-worthy yet.</span></li>
+        <li><b>No trigger pattern.</b> <span class="weak">If purchases don't cluster around identifiable events, there's no repeatable GTM motion to build.</span></li>
+        <li><b>Ingestion isn't the blocker.</b> <span class="weak">If RevOps says feeding a subledger is easy and the real problem is downstream judgment, Recurly has no structural advantage here.</span></li>
+      </ul>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 07 -->
+    <section class="slide" id="willingness-to-pay" data-title="Willingness to Pay">
+      <div class="eyebrow">08 &middot; Willingness to Pay</div>
+      <h2 class="title">Design the product around the price</h2>
+      <p class="lede">Ramanujam and Tacke's argument in <i>Monetizing Innovation</i> is that most products fail commercially not because they're badly built but because the pricing conversation happens last. For a product that doesn't exist yet, that conversation is the first artifact, not the final one.</p>
+
+      <div class="section-label">Which failure mode this product is most at risk of</div>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Failure mode</th><th>What it looks like</th><th>Risk here</th></tr>
+          <tr><td><b>Feature shock</b></td><td>Everything for everyone; no clear value story</td><td>Moderate - the temptation is to match Zuora's feature list line for line</td></tr>
+          <tr><td><b>Minivation</b></td><td>Right product, priced far too low to capture the value it creates</td><td><b>The real danger.</b> Pricing this like Stripe's 0.25% attach fee gives away a subledger that displaces headcount and audit exposure</td></tr>
+          <tr><td><b>Hidden gem</b></td><td>Real opportunity buried because it sits outside the core business</td><td>Arguably what RevRec is today - a strong asset locked inside the billing product</td></tr>
+          <tr><td><b>Undead</b></td><td>Nobody wanted it; shipped anyway</td><td>Low if Section 07 runs first; high if it doesn't</td></tr>
+        </table>
+      </div>
+
+      <div class="section-label">Leaders, fillers, killers</div>
+      <p class="body" style="margin-bottom:4px;">Not every feature moves willingness to pay. Some drive it, some are neutral, and some actively destroy it - and the third category is the one that gets missed.</p>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Capability</th><th>Class</th><th>Why</th></tr>
+          <tr><td>Source-agnostic contract ingestion</td><td><span class="pill leader">Leader</span></td><td>The reason to switch at all; nothing else matters without it</td></tr>
+          <tr><td>Automatic schedule adjustment on contract change</td><td><span class="pill leader">Leader</span></td><td>Directly displaces the manual work Section 07 measures</td></tr>
+          <tr><td>Auditor-walkable evidence trail</td><td><span class="pill leader">Leader</span></td><td>Gate to purchase - but see the killer note below on charging for it</td></tr>
+          <tr><td>Multi-book, multi-currency, multi-entity</td><td><span class="pill leader">Leader</span></td><td>Where mid-market deals are won or disqualified outright</td></tr>
+          <tr><td>Forecasting and analytics dashboards</td><td><span class="pill filler">Filler</span></td><td>Expected, demos well, rarely decides a deal</td></tr>
+          <tr><td>Pre-built ERP connectors</td><td><span class="pill filler">Filler</span></td><td>Table stakes - absence is a killer, presence is not a leader</td></tr>
+          <tr><td>Metering the audit trail as an add-on</td><td><span class="pill killer">Killer</span></td><td>Charging extra for compliance evidence reads as extortion to a finance buyer</td></tr>
+          <tr><td>Per-seat pricing for finance users</td><td><span class="pill killer">Killer</span></td><td>Penalizes adding reviewers and auditors - the exact behavior good controls require</td></tr>
+          <tr><td>Paid migration off a broken incumbent</td><td><span class="pill killer">Killer</span></td><td>Charging someone to escape pain they're already in kills the deal at the worst moment</td></tr>
+        </table>
+      </div>
+
+      <div class="section-label">The monetization model matters more than the price point</div>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Value metric</th><th>Scales with value?</th><th>Predictable?</th><th>Verdict</th></tr>
+          <tr><td><b>Basis points of recognized revenue</b></td><td>Yes</td><td>Yes - already forecast</td><td><b>Lead candidate</b> - but the bps must reflect complexity handled, not Stripe's commodity rate</td></tr>
+          <tr><td>Per active contract</td><td>Partly</td><td>Yes</td><td>Punishes long-tail contracts; useful as a secondary tier dimension</td></tr>
+          <tr><td>Per entity / per book</td><td>Weakly</td><td>Very</td><td>Good complexity proxy, poor value proxy - best as a platform floor</td></tr>
+          <tr><td>Per source system connected</td><td>No</td><td>Yes</td><td>Actively wrong - it taxes exactly the behavior the product exists to encourage</td></tr>
+        </table>
+      </div>
+      <p class="fine">Likely shape: a platform fee scaled to entity and book count, plus bps on recognized revenue above a floor. Confirm the structure with buyers before setting the number.</p>
+
+      <div class="section-label">How I'd actually measure willingness to pay</div>
+      <div class="grid2">
+        <div class="card"><h4>Van Westendorp price sensitivity</h4><p>Four questions - too expensive, expensive but worth considering, a bargain, so cheap you'd doubt it. Produces an acceptable range rather than a single number.</p></div>
+        <div class="card"><h4>Gabor-Granger</h4><p>Walk specific price points and measure purchase intent at each. Builds a demand curve and finds the revenue-maximizing point inside the Van Westendorp range.</p></div>
+        <div class="card"><h4>Choice-based conjoint</h4><p>Forced trade-offs between bundles at different prices. The only reliable way to separate leaders from fillers when everyone claims they want everything.</p></div>
+        <div class="card"><h4>MaxDiff</h4><p>Best-worst scaling across the capability list. Cheaper and faster than conjoint; good enough to rank the roadmap.</p></div>
+      </div>
+      <p class="fine">Deflate stated intent before it reaches the business case. "Definitely would buy" overstates real behavior badly, and an undeflated top box is how a plausible model turns into a hockey stick nobody hits.</p>
+
+      <div class="callout">
+        <b>The value story the sales team has to be able to tell:</b> this doesn't cost X per year, it displaces Y reconciliation hours per close, returns Z days of close time, and removes a named category of audit exposure. If the buyer can't repeat that sentence back, the price is being defended against the software line item instead of the cost it replaces - and that argument is lost before it starts.
+      </div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 08 -->
+    <section class="slide" id="build-buy-partner" data-title="Build, Buy, Partner">
+      <div class="eyebrow">09 &middot; Technical Feasibility</div>
+      <h2 class="title">Don't build a second Zuora</h2>
+      <p class="lede">The honest technical call: what Recurly should own, what it should rent, and what has to happen before any of this is sellable.</p>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Layer</th><th>Call</th><th>Why</th></tr>
+          <tr><td>Ingestion &amp; canonical event model</td><td><span class="pill own">Own</span></td><td>The differentiation lives here - turning any source system's contract changes into lifecycle events</td></tr>
+          <tr><td>Workflow, dashboards, audit trail</td><td><span class="pill own">Own</span></td><td>Where merchant trust is earned or lost; must be walkable by an external auditor</td></tr>
+          <tr><td>Novel SSP allocation logic</td><td><span class="pill partner">Partner</span></td><td>Genuinely hard, genuinely commodity once solved - don't rebuild it from scratch</td></tr>
+          <tr><td>ERP connectors (NetSuite, Intacct, SAP)</td><td><span class="pill partner">Partner</span></td><td>Mature middleware already exists (Celigo, Boomi); rebuild-risk isn't worth it</td></tr>
+          <tr><td>Tax logic</td><td><span class="pill partner">Partner</span></td><td>Already true for Recurly today (Avalara, Vertex)</td></tr>
+        </table>
+      </div>
+      <div class="callout">
+        <b>The precondition nobody skips.</b> RevRec today is presumably wired to Recurly Subscriptions' internal event bus. Before any of this is credible externally, it needs a public ingestion contract - a schema and API surface a CPQ system, a CSV export, or a NetSuite connector can write to without knowing Recurly's internals exist.
+      </div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 09 -->
+    <section class="slide" id="ai" data-title="Applied AI &amp; Evals">
+      <div class="eyebrow">10 &middot; Applied AI</div>
+      <h2 class="title">Let the model find the exceptions. Let the controller decide.</h2>
+      <p class="lede">Revenue recognition has a right answer, and the cost of getting it wrong is a restatement. Judgment stays with the controller. The model's job is narrower and more valuable: scan every contract event for discrepancies, surface the ones that need human attention, and store the reasoning so that when an auditor asks "why?" six months later, the answer takes seconds instead of days.</p>
+
+      <div class="grid2">
+        <div class="card tint">
+          <h4>What the model does</h4>
+          <p>Scans every contract event against the standards corpus, flags discrepancies, classifies exception type, and attaches the citation. Surfaces a prioritized queue so the controller sees what needs attention first.</p>
+        </div>
+        <div class="card deep">
+          <h4>What the model never does</h4>
+          <p>Makes the call. The controller reviews, decides, and approves. The system records that decision with the supporting citation, the standard reference, and the reviewer identity so it can be retrieved instantly at audit.</p>
+        </div>
+      </div>
+
+      <div class="section-label">Use case 1: RAG-assisted onboarding</div>
+      <p class="body">Implementation is where challengers lose to incumbents. A new RevRec customer spends weeks with a consultant translating their contract portfolio and revenue recognition policy into system configuration - performance obligations, SSP methods, recognition patterns, lease treatment under IFRS 16 and ASC 842. That translation work is reading comprehension against a fixed body of standards. The model reads the contract, retrieves the governing paragraph from ASC 606 or IFRS 16, and proposes a treatment with the citation attached. The accountant reviews and approves - or overrides. Either way, the decision and its rationale are stored.</p>
+
+      <div class="chart-card">
+        <p class="ct">Onboarding assist pipeline</p>
+        <p class="cs">The model surfaces. The controller decides. The system remembers.</p>
+        <svg viewBox="0 0 680 296" width="100%" style="max-height:296px;">
+          <defs>
+            <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+              <path d="M0,0 L6,3 L0,6 Z" fill="#C4B9A6"/>
+            </marker>
+          </defs>
+
+          <rect x="6" y="16" width="154" height="56" rx="11" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="19" y="38" font-size="11" font-weight="700" fill="#2E2A24">Customer corpus</text>
+          <text x="19" y="53" font-size="10" fill="#6B6459">Contracts, policy memo,</text>
+          <text x="19" y="65" font-size="10" fill="#6B6459">prior schedules</text>
+
+          <rect x="6" y="92" width="154" height="68" rx="11" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="19" y="114" font-size="11" font-weight="700" fill="#2E2A24">Standards corpus</text>
+          <text x="19" y="129" font-size="10" fill="#6B6459">ASC 606 · IFRS 15</text>
+          <text x="19" y="141" font-size="10" fill="#6B6459">IFRS 16 · ASC 842 · 340-40</text>
+          <text x="19" y="153" font-size="10" fill="#6B6459">versioned, effective-dated</text>
+
+          <line x1="164" y1="44" x2="196" y2="70" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#ah)"/>
+          <line x1="164" y1="126" x2="196" y2="101" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#ah)"/>
+
+          <rect x="202" y="56" width="104" height="60" rx="11" fill="#FCF0DA" stroke="#F2DFBC" stroke-width="1.5"/>
+          <text x="215" y="80" font-size="11" font-weight="700" fill="#2E2A24">Retrieve</text>
+          <text x="215" y="95" font-size="10" fill="#6B6459">+ ground the</text>
+          <text x="215" y="107" font-size="10" fill="#6B6459">proposal</text>
+
+          <line x1="310" y1="86" x2="336" y2="86" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#ah)"/>
+
+          <rect x="342" y="50" width="138" height="72" rx="11" fill="#FCF0DA" stroke="#F2DFBC" stroke-width="1.5"/>
+          <text x="355" y="72" font-size="11" font-weight="700" fill="#2E2A24">Proposed treatment</text>
+          <text x="355" y="88" font-size="10" fill="#6B6459">+ paragraph citation</text>
+          <text x="355" y="100" font-size="10" fill="#6B6459">+ reasoning</text>
+          <text x="355" y="112" font-size="10" fill="#6B6459">+ confidence score</text>
+
+          <line x1="484" y1="86" x2="510" y2="86" stroke="#C4B9A6" stroke-width="1.4" marker-end="url(#ah)"/>
+
+          <rect x="516" y="56" width="106" height="60" rx="11" fill="#F5A623" stroke="#D97A06" stroke-width="2"/>
+          <text x="529" y="80" font-size="11.5" font-weight="800" fill="#2E2A24">Triage</text>
+          <text x="529" y="95" font-size="11.5" font-weight="800" fill="#2E2A24">gate</text>
+          <text x="529" y="109" font-size="9" fill="#5C4A2A">rank by materiality</text>
+
+          <path d="M569,120 L569,148 L400,148 L400,192" stroke="#C4B9A6" stroke-width="1.4" fill="none" marker-end="url(#ah)"/>
+          <path d="M569,120 L569,192" stroke="#C4B9A6" stroke-width="1.4" fill="none" marker-end="url(#ah)"/>
+
+          <rect x="330" y="198" width="142" height="64" rx="11" fill="#FDF9F0" stroke="#F0E6D4" stroke-width="1.5"/>
+          <text x="343" y="220" font-size="11" font-weight="700" fill="#2E2A24">Auto-apply</text>
+          <text x="343" y="235" font-size="10" fill="#6B6459">narrow whitelist only,</text>
+          <text x="343" y="247" font-size="10" fill="#6B6459">fully logged</text>
+
+          <rect x="498" y="198" width="142" height="64" rx="11" fill="#FCF0DA" stroke="#F2DFBC" stroke-width="1.5"/>
+          <text x="511" y="220" font-size="11" font-weight="700" fill="#2E2A24">Controller dashboard</text>
+          <text x="511" y="235" font-size="10" fill="#6B6459">review, decide, log</text>
+          <text x="511" y="247" font-size="10" fill="#6B6459">decision as evidence</text>
+        </svg>
+        <div class="map-caption">The human gate is the product, not a safety afterthought.</div>
+      </div>
+
+      <div class="section-label">Use case 2: Exception dashboard for the controller</div>
+      <p class="body">Every close cycle, the model scans all contract events against the recognition schedule and flags discrepancies - a mid-term seat change that was never re-allocated, a renewal whose pricing didn't chain to the prior schedule, a usage overage that crossed a tier boundary. Each exception lands in a dashboard with the contract reference, the specific variance, the applicable standard paragraph, and a suggested classification. The controller reviews the queue, makes the call, and the decision is logged with their identity and the supporting citation.</p>
+
+      <div class="panel">
+        <h3>What the controller sees</h3>
+        <div class="cols">
+          <div>
+            <div class="k">Priority queue</div>
+            <div class="v">Ranked by materiality</div>
+            <div class="n">Highest-dollar and highest-risk exceptions surface first. The controller works a sorted, filterable queue, not a spreadsheet.</div>
+          </div>
+          <div>
+            <div class="k">Each exception card</div>
+            <div class="v">Contract + standard + variance</div>
+            <div class="n">The contract clause, the governing ASC 606 or IFRS 16 paragraph, the dollar variance, and a suggested treatment. One click to approve, override, or escalate.</div>
+          </div>
+          <div>
+            <div class="k">Decision log</div>
+            <div class="v">Instant audit retrieval</div>
+            <div class="n">Every decision stored with the citation, the reviewer, and the timestamp. When the auditor asks "why?" six months later, the controller pulls up the record in seconds.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">Use case 3: Contract modification triage</div>
+      <p class="body">Classifies a modification as separate contract, prospective, or cumulative catch-up, with the reasoning and governing paragraph attached. The most error-prone area of ASC 606. High value, higher stakes, so it ships after the eval harness is proven on the onboarding use case. The controller still makes the call; the model surfaces the classification and the evidence.</p>
+
+      <div class="section-label">Corpus design - the part that decides whether this works</div>
+      <ul class="clean">
+        <li><b>Two corpora, kept separate.</b> <span class="weak">The standards corpus (ASC 606, IFRS 15, IFRS 16, ASC 842, ASC 340-40, plus interpretive guidance) is shared. The customer corpus - their contracts, policy memo, historical schedules - is tenant-isolated and never crosses accounts.</span></li>
+        <li><b>Effective-dated and versioned.</b> <span class="weak">An auditor will ask which version of the guidance a decision was made under. The retrieval index carries effective dates, and a new ASU triggers re-indexing plus a full eval rerun - not a silent corpus swap.</span></li>
+        <li><b>Chunk at the paragraph level the standard itself uses.</b> <span class="weak">Citations have to land on something an accountant can look up. Arbitrary token windows produce citations nobody can verify, which is worse than no citation.</span></li>
+        <li><b>Retrieval failure must be visible.</b> <span class="weak">If nothing relevant comes back, the correct output is "no grounded answer, route to a human" - never an ungrounded generation. Silence is a valid response here.</span></li>
+      </ul>
+
+      <div class="section-label">Evals</div>
+      <p class="body">The golden set gets built from design-partner contracts during the Section 07 pilots, adjudicated by their own accountants and pressure-tested against the auditor track. Held out, versioned, and re-run on every prompt, model, or corpus change.</p>
+      <div class="table-wrap">
+        <table class="rows">
+          <tr><th>Layer</th><th>What it measures</th><th>Method</th></tr>
+          <tr><td><b>Retrieval</b></td><td>Did the governing paragraph come back in the top-k?</td><td>Recall@k against accountant-labeled ground truth, reported per standard rather than pooled</td></tr>
+          <tr><td><b>Citation faithfulness</b></td><td>Does the cited paragraph actually support the claim?</td><td>LLM-as-judge, with a human spot-audit of the judge itself on a sampled slice</td></tr>
+          <tr><td><b>Treatment classification</b></td><td>Separate contract vs. prospective vs. cumulative catch-up</td><td>Accuracy against adjudicated ground truth, broken out by class - aggregate accuracy hides the rare-class failures that matter</td></tr>
+          <tr><td><b>Reasoning quality</b></td><td>Would an accountant accept the explanation as a rationale?</td><td>LLM-as-judge calibrated against human raters, with inter-rater agreement tracked</td></tr>
+          <tr><td><b>Miss rate</b></td><td>Exceptions the system waved through without flagging</td><td>The metric that governs the release decision - weighted far above precision</td></tr>
+        </table>
+      </div>
+
+      <div class="callout">
+        <b>Set the threshold from the cost ratio, not from a round accuracy number.</b> A false flag costs an accountant four minutes of review. A missed exception costs a restatement, an audit finding, and the customer relationship. Those two errors are not within an order of magnitude of each other, so the confidence threshold gets tuned hard toward recall - and I'd resist committing to a headline accuracy figure before the golden set exists.
+      </div>
+
+      <div class="section-label">Rollout and guardrails</div>
+      <ul class="clean">
+        <li><b>Every exception is human-reviewed.</b> <span class="weak">The model flags and ranks. The controller reviews and decides. There is no tier where the model makes a recognition decision on its own. Auto-apply is limited to low-judgment event types on a narrow whitelist, and only after measured accuracy on that specific type clears the bar.</span></li>
+        <li><b>Deterministic math, assisted triage.</b> <span class="weak">The model surfaces discrepancies and retrieves citations. The existing engine computes the schedule. An auditor can accept a rules engine doing arithmetic and a human making the judgment call. They cannot accept a language model doing either, and they shouldn't.</span></li>
+        <li><b>Every decision is logged as audit-ready evidence.</b> <span class="weak">The contract clause, the retrieved standard paragraph with corpus version, the model's suggested classification, the controller's actual decision, and the approver identity. When the auditor asks "why was this recognized this way?" the controller pulls up the full record - not a memory, not an email thread, not a spreadsheet version.</span></li>
+        <li><b>Override rate is the live production signal.</b> <span class="weak">If accountants start overriding more often, something has drifted - the corpus, the model, or the customer's contract mix. A better early warning than any offline metric.</span></li>
+        <li><b>Data quality is a hard ceiling.</b> <span class="weak">An agentic layer propagates bad inputs rather than catching them. If contract data is wrong upstream, no amount of retrieval quality fixes the schedule - which is the argument for owning ingestion in the first place.</span></li>
+      </ul>
+
+      <div class="section-label">Why this is a GTM lever, not a feature</div>
+      <p class="body">If RAG-assisted onboarding takes implementation from months to weeks and the exception dashboard cuts close time from days to hours, those show up in the value story directly: displaced reconciliation headcount, recovered close-cycle time, and instant audit retrieval instead of weeks of rework. Neither becomes a separate AI SKU - charging for the thing that makes the product usable is the same mistake as metering the audit trail.</p>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 10 -->
+    <section class="slide" id="gtm" data-title="GTM">
+      <div class="eyebrow">11 &middot; Go-to-Market</div>
+      <h2 class="title">Land mid-market. Point at Salesforce. Don't start there.</h2>
+      <p class="lede">Salesforce is the right north star and the wrong first customer. The ICP that gets this product proven is the segment that's outgrown Stripe RevRec but isn't ready for a multi-year Zuora implementation.</p>
+      <div class="grid2">
+        <div class="card tint"><h4>ICP v1</h4><p>$10M–$500M ARR B2B SaaS with multi-element contracts, currently reconciling by hand or bolted onto a point tool like RightRev or Leapfin.</p></div>
+        <div class="card"><h4>Entry motion</h4><p>5–8 design partners, free pilot run against real historical contracts to prove schedule accuracy before any commercial conversation.</p></div>
+        <div class="card"><h4>Channel</h4><p>Existing Recurly enterprise relationships with adjacent B2B arms - a warmer path in than cold enterprise outbound.</p></div>
+        <div class="card"><h4>Packaging</h4><p>Sold standalone, not gated behind Recurly Subscriptions - the unbundling has to be true in the price sheet, not just the pitch.</p></div>
+      </div>
+      <div class="section-label">Segment on willingness to pay, not company size</div>
+      <p class="body">ARR band is a convenient proxy but a poor segmentation axis. The real cut is contract complexity crossed with trigger urgency: a $40M-ARR company three months from an S-1 has far higher willingness to pay than a $300M company with a clean audit history and a working spreadsheet. Segment on that, and the pricing tiers follow the segments rather than the other way round.</p>
+      <div class="section-label">Sequencing the win story</div>
+      <p class="body">Prove the model on the mid-market cohort first. A Salesforce-shaped anchor logo becomes the reference story once real design partners validate accuracy and price - leading with the aspirational logo before that proof exists is how this pitch loses credibility with a room full of finance buyers.</p>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 11 -->
+    <section class="slide" id="risks" data-title="Risks">
+      <div class="eyebrow">12 &middot; Risks</div>
+      <h2 class="title">Where I'd hold firm, and where I'd bend</h2>
+      <div class="grid2">
+        <div class="card tint">
+          <h4>Holding firm</h4>
+          <p>The lifecycle-native wedge is real. Competing on Zuora's contract-depth terms is a losing bet regardless of engineering investment - a decade head start doesn't close.</p>
+        </div>
+        <div class="card">
+          <h4>Open to evidence</h4>
+          <p>If discovery shows SSP allocation is the actual blocker - not lifecycle handling - that reorders the build priority toward allocation logic sooner than planned.</p>
+        </div>
+      </div>
+      <ul class="clean">
+        <li><b>Cannibalization risk:</b> <span class="weak">a standalone RevRec could confuse or compete with the existing bundled RevRec offer - packaging has to draw a clear line.</span></li>
+        <li><b>Strategic fit risk:</b> <span class="weak">Recurly's core DNA is high-volume consumer subscription. If leadership decides B2B enterprise isn't the strategic direction, this doesn't get built regardless of market size - that call sits above this case study.</span></li>
+        <li><b>Timeline risk:</b> <span class="weak">the ingestion API precondition (Section 09) is real engineering time before any GTM motion is credible - not a fast follow.</span></li>
+        <li><b>Minivation risk:</b> <span class="weak">the pressure to price this as a cheap attach product to drive adoption is real, and it would permanently anchor the category at Stripe's rate. Easier to discount from a defensible price than to raise one.</span></li>
+        <li><b>AI credibility risk:</b> <span class="weak">one confidently wrong, well-cited recommendation in front of an auditor costs more trust than the feature ever earns. The eval harness is a precondition for shipping the assist, not a follow-on workstream - and if it isn't ready, the assist doesn't ship.</span></li>
+      </ul>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 12 -->
+    <section class="slide" id="metrics" data-title="Metrics">
+      <div class="eyebrow">13 &middot; Measurement</div>
+      <h2 class="title">Four layers, and an honest note on lag</h2>
+      <div class="panel">
+        <h3>How we'd know it worked</h3>
+        <div class="cols">
+          <div>
+            <div class="k">Merchant outcome</div>
+            <div class="v">Days to close</div>
+            <div class="n">Schedule accuracy vs. prior manual process, and time from contract signed to live in the subledger.</div>
+          </div>
+          <div>
+            <div class="k">Platform health</div>
+            <div class="v">Zero-touch rate</div>
+            <div class="n">Contracts ingested per source system; share of lifecycle events reconciled with no manual touch; AI override rate trend.</div>
+          </div>
+          <div>
+            <div class="k">Commercial</div>
+            <div class="v">Realized vs. list</div>
+            <div class="n">Discount depth, win rate against the unbundlers specifically, and implementation days per deal.</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h4>Compliance risk - the lagging layer</h4>
+        <p>Audit findings and restatement rate are annual and lagging by nature. The leading proxy in the meantime is exception rate, reconciliation variance, and override rate. Name that gap up front rather than pretend the lagging number is live.</p>
+      </div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 13 -->
+    <section class="slide" id="close" data-title="The First 90 Days">
+      <div class="eyebrow">14 &middot; Close</div>
+      <h2 class="title">What I'd actually do in the first 90 days</h2>
+      <div class="steps">
+        <div class="step"><div class="n">1</div><div><h5>Weeks 1–5 &middot; Discovery</h5><p>Run the twenty interviews in Section 06, including the auditor track and the lost-deal cohort. Output is the ranked exception taxonomy and a go/no-go on the lifecycle wedge.</p></div></div>
+        <div class="step"><div class="n">2</div><div><h5>Weeks 4–8 &middot; Willingness to pay</h5><p>Run the pricing instruments against the same cohort - Van Westendorp for the range, conjoint for the package. Output is a monetization model and a defensible price band, before the roadmap is locked.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h5>Weeks 5–10 &middot; Ingestion contract</h5><p>Spec the public schema and API surface with Engineering - the precondition every other milestone depends on.</p></div></div>
+        <div class="step"><div class="n">4</div><div><h5>Weeks 8–12 &middot; Pilot and golden set</h5><p>First design-partner pilot against real historical contract data. Measure schedule accuracy against their own prior close, and use the same adjudicated contracts to seed the eval golden set before any AI assist is built.</p></div></div>
+      </div>
+      <div class="close-line">Recurly doesn't need to beat Zuora at Zuora's game. It needs to be the subledger that gets the lifecycle event right - for revenue it doesn't bill today, starting with the customers who've already outgrown the commodity option.</div>
+    </section>
+
+    <footer>
+      <div>Prepared by Jen Deepa for a final-round conversation with Priya Lakshminarayanan, CPO.<br>Willingness-to-pay framing draws on <i>Monetizing Innovation</i> (Ramanujam &amp; Tacke).</div>
+      <div>14 sections</div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const sections = Array.from(document.querySelectorAll('section.slide'));
+  const railNav = document.getElementById('railNav');
+  const mobileNav = document.getElementById('mobileNav');
+  const progressBar = document.getElementById('progressBar');
+
+  sections.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.className = 'rail-item';
+    a.href = '#' + s.id;
+    a.innerHTML = `<span class="n num">${String(i+1).padStart(2,'0')}</span><span>${s.dataset.title}</span>`;
+    railNav.appendChild(a);
+
+    const opt = document.createElement('option');
+    opt.value = '#' + s.id;
+    opt.textContent = `${String(i+1).padStart(2,'0')} - ${s.dataset.title}`;
+    mobileNav.appendChild(opt);
+  });
+  const railItems = Array.from(railNav.children);
+
+  function setActive(i){
+    railItems.forEach(item => item.classList.remove('active'));
+    if(railItems[i]) railItems[i].classList.add('active');
+    if(mobileNav.selectedIndex !== i) mobileNav.selectedIndex = i;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){ setActive(sections.indexOf(entry.target)); }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+  sections.forEach(s => observer.observe(s));
+
+  function updateProgress(){
+    const st = window.scrollY;
+    const dh = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (dh > 0 ? (st / dh) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive:true });
+  updateProgress();
+  setActive(0);
+</script>
+</body>
+</html>
