@@ -137,6 +137,7 @@
   }
   .panel h3{ margin:0 0 16px; font-size:20px; font-weight:800; letter-spacing:-0.015em; }
   .panel .cols{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media(max-width:700px){ .panel .cols{ grid-template-columns:1fr; gap:14px; } }
   .panel .cols .k{ font-size:11px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--amber-deep); margin-bottom:6px; }
   .panel .cols .v{ font-size:19px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px; line-height:1.2; }
   .panel .cols .n{ font-size:13px; color:var(--slate); line-height:1.55; }
@@ -181,6 +182,29 @@
 
   /* ---------- Tables ---------- */
   .table-wrap{ background:var(--card); border:1px solid var(--border); border-radius:var(--r); overflow:hidden; margin:20px 0; box-shadow:var(--shadow); }
+  @media(max-width:700px){
+    /* Scrollable tables stay scrollable */
+    .table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table.rows{ min-width:560px; }
+    /* Stacked tables become cards */
+    .table-wrap-stack{ overflow-x:visible !important; }
+    .table-stack{ min-width:0 !important; }
+    .table-stack, .table-stack tbody, .table-stack tr, .table-stack td{ display:block; width:100%; box-sizing:border-box; }
+    .table-stack thead{ display:none; }
+    .table-stack tr{
+      border:1px solid var(--border); border-radius:10px;
+      margin-bottom:10px; overflow:hidden;
+      background:var(--card);
+    }
+    .table-stack td{
+      border-top:1px solid var(--border-soft);
+      padding:10px 13px; font-size:13px; line-height:1.5;
+      white-space:normal; word-break:break-word;
+    }
+    .table-stack td:first-child{
+      background:var(--panel); border-top:none; font-weight:700;
+    }
+  }
   table.rows{ width:100%; border-collapse:collapse; }
   table.rows th{
     text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
@@ -215,11 +239,12 @@
   .close-line{ font-size:21px; font-weight:800; line-height:1.45; margin-top:24px; letter-spacing:-0.015em; }
 
   .chart-card{ background:var(--card); border:1px solid var(--border); border-radius:var(--r-lg); padding:22px 24px; margin:20px 0; box-shadow:var(--shadow); }
+  @media(max-width:700px){ .chart-card .svg-scroll{ overflow-x:auto; -webkit-overflow-scrolling:touch; } .chart-card .svg-scroll svg{ min-width:560px; } }
   .chart-card .ct{ font-size:17px; font-weight:800; letter-spacing:-0.015em; margin:0 0 3px; }
   .chart-card .cs{ font-size:13px; color:var(--slate); margin:0 0 14px; }
   .map-caption{ font-size:12px; color:var(--slate-lo); margin-top:10px; text-align:center; }
 
-  .section-label{ font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--slate-lo); margin:28px 0 12px; }
+  .section-label{ font-size:10.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--slate-lo); margin:28px 0 12px; overflow-wrap:break-word; word-break:break-word; }
 
   .divider{ height:1px; background:var(--border); max-width:800px; margin:0 auto; }
 
@@ -229,17 +254,20 @@
     display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;
   }
 
+  @media (max-width:500px){ .stat-row{ grid-template-columns:1fr; } }
   @media (max-width:940px){
     .rail{ display:none; }
     .topbar{ display:flex; }
-    section.slide{ padding:38px 20px 40px; }
+    section.slide{ padding:30px 16px 36px; }
     footer{ padding:22px 20px 50px; }
     .grid2, .grid3, .panel .cols{ grid-template-columns:1fr; }
     .stat-row{ grid-template-columns:1fr 1fr; }
-    h1.title{ font-size:28px; }
-    h2.title{ font-size:23px; }
-    .hero{ padding:24px 22px 26px; }
-    .panel{ padding:22px 20px; }
+    h1.title{ font-size:26px; }
+    h2.title{ font-size:22px; }
+    .hero{ padding:20px 18px 22px; }
+    .panel{ padding:18px 16px; }
+    .thesis-box{ font-size:16px; padding:20px 18px; }
+    .chart-card{ padding:16px 14px; }
     .table-wrap{ overflow-x:auto; }
     table.rows{ min-width:560px; }
   }
@@ -272,30 +300,30 @@
       <div class="hero">
         <div class="brandmark"><span class="badge">R</span>RevRec, Unbundled</div>
         <div class="eyebrow">Revenue recognition &middot; Case study &middot; Standalone service</div>
-        <h1 class="title">Recognize revenue you don't bill.</h1>
-        <p class="sub">Recurly RevRec is excellent at recognizing revenue Recurly bills. It has nothing to say about revenue that never touches Recurly's billing engine - which is most B2B contract revenue, including businesses shaped like Salesforce.</p>
+        <h1 class="title">Revenue recognition that grows beyond the subscription.</h1>
+        <p class="sub">Two parallel bets: deepen RevRec for existing subscription management customers, and build a discovery plan to offer RevRec as a standalone product to B2B contract businesses that never use Recurly billing at all.</p>
       </div>
 
       <div class="stat-row">
         <div class="stat">
-          <div class="l">Scope</div>
-          <div class="v num">14</div>
-          <div class="d">sections, discovery through GTM</div>
+          <div class="l">RevRec SaaS market</div>
+          <div class="v num">$5B+</div>
+          <div class="d up">TAM by 2028, growing ~14% CAGR</div>
+        </div>
+        <div class="stat">
+          <div class="l">Target ACV</div>
+          <div class="v num">$100-200K</div>
+          <div class="d">at 5-10bps on $200M recognized revenue</div>
         </div>
         <div class="stat">
           <div class="l">Discovery plan</div>
-          <div class="v num">20</div>
-          <div class="d">interviews before a line of code</div>
+          <div class="v num">23</div>
+          <div class="d">interviews - 20 buyers + 3 auditors</div>
         </div>
         <div class="stat">
-          <div class="l">Competitors</div>
+          <div class="l">Competitors mapped</div>
           <div class="v num">5</div>
           <div class="d up">postures, not feature lists</div>
-        </div>
-        <div class="stat">
-          <div class="l">AI use cases</div>
-          <div class="v num">3</div>
-          <div class="d up">ranked by risk, not by hype</div>
         </div>
       </div>
 
@@ -321,9 +349,9 @@
       <div class="eyebrow">02 &middot; The Gap</div>
       <h2 class="title">Two customer bases Recurly can't see today</h2>
       <ul class="clean" style="margin-bottom:26px;">
-          <li><b>RevRec today is a feature of Recurly Subscriptions.</b> <span class="weak">If a contract's billing event doesn't originate inside Recurly, RevRec never learns about it - regardless of how strategically important that customer is.</span></li>
-          <li><b>Most B2B contract revenue never touches Recurly's billing engine.</b> <span class="weak">Multi-element deals, CPQ-sourced invoices, marketplace revenue - invisible to a billing-coupled RevRec.</span></li>
-          <li><b>The market for "gets the schedule right" is bigger than "bills the transaction."</b> <span class="weak">That escalation path runs to the CFO regardless of whose platform is upstream.</span></li>
+          <li><b>Recurly RevRec already supports some external data import.</b> <span class="weak">Flat invoice and CSV ingestion exists. The gap is not ingestion per se - it is contract-native, lifecycle-event ingestion: the ability to ingest a contract modification and automatically propagate the schedule change, not just accept a new invoice row.</span></li>
+          <li><b>That propagation gap is where B2B contract revenue breaks.</b> <span class="weak">Multi-element deals, mid-term seat changes, pause and cancellation events - none of these resolve cleanly from a flat import. The error accumulates silently until close.</span></li>
+          <li><b>The market for "gets the lifecycle event right" is bigger than "ingests the invoice."</b> <span class="weak">That escalation path runs to the CFO regardless of whose platform is upstream.</span></li>
       </ul>
       <div class="grid2">
         <div class="card">
@@ -348,6 +376,9 @@
       <h2 class="title">The close today, mapped end to end</h2>
       <p class="lede">Before proposing what to build, it helps to walk the current journey honestly. Every box below is a real step a revenue accountant performs today. The ones highlighted in amber are where the process breaks.</p>
 
+      <div class="callout" style="margin-top:0;">
+        <b>Threats the 2024-era posture map undersells.</b> Three worth watching: NetSuite and Sage Intacct are closing the native RevRec gap from below, making "good enough" credible for simpler contract structures. ERPs becoming adequate removes the pain that drives buyers to point solutions. Stripe has shown it will move upmarket when it has a wedge - RevRec at 0.25% is a loss-leader, not a ceiling. And the structural unbundler threat (RightRev, Leapfin) intensifies as their corpus of contract patterns grows - their moat is data, not code.
+      </div>
       <div class="chart-card" style="padding:20px 22px 24px;">
         <p class="ct">Current-state revenue recognition journey</p>
         <p class="cs" style="margin-bottom:20px;">From contract execution through audit inquiry. Amber-bordered boxes are friction points.</p>
@@ -360,7 +391,15 @@
             vertical-align:top; padding-top:10px; width:1%;
           }
           .jrow-steps{ padding-bottom:12px; }
-          .jsteps{ display:flex; align-items:center; gap:0; flex-wrap:nowrap; }
+          .jsteps{ display:flex; align-items:stretch; gap:0; flex-wrap:nowrap; }
+          @media(max-width:700px){
+            .jmap, .jmap tbody, .jmap tr, .jmap td { display:block; width:100%; }
+            .jrow-label{ padding:10px 0 4px; width:auto; font-size:9px; }
+            .jrow-steps{ padding-bottom:8px; }
+            .jsteps{ flex-direction:column; gap:6px; align-items:stretch; }
+            .jbox{ max-width:100%; }
+            .jarr{ transform:rotate(90deg); align-self:center; padding:0; }
+          }
           .jbox{
             background:#FDF9F0; border:1.5px solid #F0E6D4; border-radius:10px;
             padding:8px 11px; min-width:0; flex:1; max-width:220px;
@@ -418,11 +457,11 @@
             <td class="jrow-label">Mid-term<br>changes</td>
             <td class="jrow-steps">
               <div class="jsteps">
-                <div class="jbox"><b>Contract modified</b><span>Upsell, downgrade, renewal</span></div>
+                <div class="jbox"><b>Contract modified</b><span>Upsell, downgrade, pause, cancel, or renewal</span></div>
                 <div class="jarr">&#8594;</div>
-                <div class="jbox hot"><b>Re-allocate remaining value</b><span>New spreadsheet version, new tabs</span></div>
+                <div class="jbox hot"><b>Re-allocate remaining value</b><span>New spreadsheet version, new tabs, often copied from prior version</span></div>
                 <div class="jarr">&#8594;</div>
-                <div class="jbox hot"><b>Hope nothing was missed</b><span>No systematic check exists</span></div>
+                <div class="jbox hot"><b>Hope nothing was missed</b><span>No systematic check; pauses and cancels especially error-prone</span></div>
               </div>
             </td>
           </tr>
@@ -482,7 +521,7 @@
       <div class="chart-card">
         <p class="ct">Where the wedge sits</p>
         <p class="cs">Contract complexity against coupling to a single billing system</p>
-        <svg viewBox="0 0 640 350" width="100%" style="max-height:340px;">
+        <div class="svg-scroll"><svg viewBox="0 0 640 350" width="100%" style="max-height:340px; min-width:400px;">
           <line x1="62" y1="16" x2="62" y2="312" stroke="#EADFC9" stroke-width="1.5"/>
           <line x1="62" y1="312" x2="600" y2="312" stroke="#EADFC9" stroke-width="1.5"/>
           <text x="62" y="332" font-size="10.5" fill="#9C948A">Coupled to one billing system</text>
@@ -502,7 +541,7 @@
           <text x="348" y="157" font-size="11" font-weight="800" fill="#2E2A24">lifecycle-native,</text>
           <text x="348" y="171" font-size="11" font-weight="800" fill="#2E2A24">source-agnostic</text>
         </svg>
-        <div class="map-caption">Mid-complexity, source-agnostic, lifecycle-native - open ground between the unbundlers and Zuora.</div>
+        </div><div class="map-caption">Mid-complexity, source-agnostic, lifecycle-native - open ground between the unbundlers and Zuora.</div>
       </div>
     </section>
     <div class="divider"></div>
@@ -531,12 +570,12 @@
       <div class="eyebrow">06 &middot; Worked Example</div>
       <h2 class="title">A Salesforce-shaped contract, walked through</h2>
       <p class="lede">Not a claim that Salesforce is a day-one customer - a stand-in for the contract shape the standalone product has to handle: multi-year, multi-element, usage-inclusive.</p>
-      <div class="table-wrap">
-        <table class="rows">
+      <div class="table-wrap table-wrap-stack">
+        <table class="rows table-stack">
           <tr><th>Contract event</th><th>What breaks today</th><th>The lifecycle-native fix</th></tr>
-          <tr><td><b>3-year deal</b><br><span class="who">license + implementation + usage overage</span></td><td>SSP allocation across three revenue streams done by hand in a spreadsheet</td><td>Contract ingested once; allocation schedule generated and versioned automatically</td></tr>
-          <tr><td><b>Mid-term seat change</b></td><td>Manual re-allocation across remaining periods; easy to get wrong, hard to audit</td><td>Treated as a lifecycle event - the same primitive Recurly runs for a $9.99 subscription, applied to a $2M contract</td></tr>
-          <tr><td><b>Multi-year renewal</b><br><span class="who">with new pricing</span></td><td>Prior schedule and new schedule reconciled manually at renewal</td><td>Renewal event chains to the prior schedule automatically, with a full audit trail</td></tr>
+          <tr><td data-label="Contract event"><b>3-year deal</b><br><span class="who">license + implementation + usage overage</span></td><td>SSP allocation across three revenue streams done by hand in a spreadsheet</td><td>Contract ingested once; allocation schedule generated and versioned automatically</td></tr>
+          <tr><td data-label="Contract event"><b>Mid-term seat change</b></td><td>Manual re-allocation across remaining periods; easy to get wrong, hard to audit</td><td>Treated as a lifecycle event - the same primitive Recurly runs for a $9.99 subscription, applied to a $2M contract</td></tr>
+          <tr><td data-label="Contract event"><b>Multi-year renewal</b><br><span class="who">with new pricing</span></td><td>Prior schedule and new schedule reconciled manually at renewal</td><td>Renewal event chains to the prior schedule automatically, with a full audit trail</td></tr>
         </table>
       </div>
       <div class="quote">The finance team doesn't need a smarter allocation engine. It needs every contract change to become a tracked event instead of a spreadsheet edit.</div>
@@ -551,7 +590,7 @@
 
       <div class="section-label">Who to talk to, and what each one can actually tell you</div>
       <div class="table-wrap">
-        <table class="rows">
+        <table class="rows table-stack">
           <tr><th>Who</th><th>What they know that nobody else does</th><th>What they can't tell you</th></tr>
           <tr><td><b>Revenue accounting manager</b><br><span class="who">daily user</span></td><td>The exception taxonomy - exactly which contract events force a manual journal entry, and how often</td><td>Anything about budget or purchase authority</td></tr>
           <tr><td><b>Controller</b><br><span class="who">process owner, likely champion</span></td><td>Close timeline, headcount on reconciliation, whether a budget line already exists</td><td>Whether the CFO will actually fund it</td></tr>
@@ -561,7 +600,7 @@
         </table>
       </div>
 
-      <div class="section-label">Sample design - roughly 20 conversations</div>
+      <div class="section-label">Sample design - 20 buyer interviews + 3 auditors = 23 total</div>
       <div class="grid3">
         <div class="card"><h4>6 &middot; Still manual</h4><p>Spreadsheet-and-heroics close. Tests whether the pain is acute enough to fund a purchase at all.</p></div>
         <div class="card"><h4>5 &middot; On a point solution</h4><p>RightRev, Leapfin, Ordway. Tests what the unbundlers get right and where they still leave gaps.</p></div>
@@ -623,41 +662,41 @@
       <p class="lede">Ramanujam and Tacke's argument in <i>Monetizing Innovation</i> is that most products fail commercially not because they're badly built but because the pricing conversation happens last. For a product that doesn't exist yet, that conversation is the first artifact, not the final one.</p>
 
       <div class="section-label">Which failure mode this product is most at risk of</div>
-      <div class="table-wrap">
-        <table class="rows">
+      <div class="table-wrap table-wrap-stack">
+        <table class="rows table-stack">
           <tr><th>Failure mode</th><th>What it looks like</th><th>Risk here</th></tr>
-          <tr><td><b>Feature shock</b></td><td>Everything for everyone; no clear value story</td><td>Moderate - the temptation is to match Zuora's feature list line for line</td></tr>
-          <tr><td><b>Minivation</b></td><td>Right product, priced far too low to capture the value it creates</td><td><b>The real danger.</b> Pricing this like Stripe's 0.25% attach fee gives away a subledger that displaces headcount and audit exposure</td></tr>
-          <tr><td><b>Hidden gem</b></td><td>Real opportunity buried because it sits outside the core business</td><td>Arguably what RevRec is today - a strong asset locked inside the billing product</td></tr>
-          <tr><td><b>Undead</b></td><td>Nobody wanted it; shipped anyway</td><td>Low if Section 07 runs first; high if it doesn't</td></tr>
+          <tr><td data-label="Failure mode"><b>Feature shock</b></td><td>Everything for everyone; no clear value story</td><td>Moderate - the temptation is to match Zuora's feature list line for line</td></tr>
+          <tr><td data-label="Failure mode"><b>Minivation</b></td><td>Right product, priced far too low to capture the value it creates</td><td><b>The real danger.</b> Pricing this like Stripe's 0.25% attach fee gives away a subledger that displaces headcount and audit exposure</td></tr>
+          <tr><td data-label="Failure mode"><b>Hidden gem</b></td><td>Real opportunity buried because it sits outside the core business</td><td>Arguably what RevRec is today - a strong asset locked inside the billing product</td></tr>
+          <tr><td data-label="Failure mode"><b>Undead</b></td><td>Nobody wanted it; shipped anyway</td><td>Low if Section 07 runs first; high if it doesn't</td></tr>
         </table>
       </div>
 
       <div class="section-label">Leaders, fillers, killers</div>
       <p class="body" style="margin-bottom:4px;">Not every feature moves willingness to pay. Some drive it, some are neutral, and some actively destroy it - and the third category is the one that gets missed.</p>
       <div class="table-wrap">
-        <table class="rows">
+        <table class="rows table-stack">
           <tr><th>Capability</th><th>Class</th><th>Why</th></tr>
-          <tr><td>Source-agnostic contract ingestion</td><td><span class="pill leader">Leader</span></td><td>The reason to switch at all; nothing else matters without it</td></tr>
-          <tr><td>Automatic schedule adjustment on contract change</td><td><span class="pill leader">Leader</span></td><td>Directly displaces the manual work Section 07 measures</td></tr>
-          <tr><td>Auditor-walkable evidence trail</td><td><span class="pill leader">Leader</span></td><td>Gate to purchase - but see the killer note below on charging for it</td></tr>
-          <tr><td>Multi-book, multi-currency, multi-entity</td><td><span class="pill leader">Leader</span></td><td>Where mid-market deals are won or disqualified outright</td></tr>
-          <tr><td>Forecasting and analytics dashboards</td><td><span class="pill filler">Filler</span></td><td>Expected, demos well, rarely decides a deal</td></tr>
-          <tr><td>Pre-built ERP connectors</td><td><span class="pill filler">Filler</span></td><td>Table stakes - absence is a killer, presence is not a leader</td></tr>
-          <tr><td>Metering the audit trail as an add-on</td><td><span class="pill killer">Killer</span></td><td>Charging extra for compliance evidence reads as extortion to a finance buyer</td></tr>
-          <tr><td>Per-seat pricing for finance users</td><td><span class="pill killer">Killer</span></td><td>Penalizes adding reviewers and auditors - the exact behavior good controls require</td></tr>
-          <tr><td>Paid migration off a broken incumbent</td><td><span class="pill killer">Killer</span></td><td>Charging someone to escape pain they're already in kills the deal at the worst moment</td></tr>
+          <tr><td data-label="Capability">Source-agnostic contract ingestion</td><td><span class="pill leader">Leader</span></td><td>The reason to switch at all; nothing else matters without it</td></tr>
+          <tr><td data-label="Capability">Automatic schedule adjustment on contract change</td><td><span class="pill leader">Leader</span></td><td>Directly displaces the manual work Section 07 measures</td></tr>
+          <tr><td data-label="Capability">Auditor-walkable evidence trail</td><td><span class="pill leader">Leader</span></td><td>Gate to purchase - but see the killer note below on charging for it</td></tr>
+          <tr><td data-label="Capability">Multi-book, multi-currency, multi-entity</td><td><span class="pill leader">Leader</span></td><td>Where mid-market deals are won or disqualified outright</td></tr>
+          <tr><td data-label="Capability">Forecasting and analytics dashboards</td><td><span class="pill filler">Filler</span></td><td>Expected, demos well, rarely decides a deal</td></tr>
+          <tr><td data-label="Capability">Pre-built ERP connectors</td><td><span class="pill filler">Filler</span></td><td>Table stakes - absence is a killer, presence is not a leader</td></tr>
+          <tr><td data-label="Capability">Metering the audit trail as an add-on</td><td><span class="pill killer">Killer</span></td><td>Charging extra for compliance evidence reads as extortion to a finance buyer</td></tr>
+          <tr><td data-label="Capability">Per-seat pricing for finance users</td><td><span class="pill killer">Killer</span></td><td>Penalizes adding reviewers and auditors - the exact behavior good controls require</td></tr>
+          <tr><td data-label="Capability">Paid migration off a broken incumbent</td><td><span class="pill killer">Killer</span></td><td>Charging someone to escape pain they're already in kills the deal at the worst moment</td></tr>
         </table>
       </div>
 
       <div class="section-label">The monetization model matters more than the price point</div>
       <div class="table-wrap">
-        <table class="rows">
+        <table class="rows table-stack">
           <tr><th>Value metric</th><th>Scales with value?</th><th>Predictable?</th><th>Verdict</th></tr>
-          <tr><td><b>Basis points of recognized revenue</b></td><td>Yes</td><td>Yes - already forecast</td><td><b>Lead candidate</b> - but the bps must reflect complexity handled, not Stripe's commodity rate</td></tr>
-          <tr><td>Per active contract</td><td>Partly</td><td>Yes</td><td>Punishes long-tail contracts; useful as a secondary tier dimension</td></tr>
-          <tr><td>Per entity / per book</td><td>Weakly</td><td>Very</td><td>Good complexity proxy, poor value proxy - best as a platform floor</td></tr>
-          <tr><td>Per source system connected</td><td>No</td><td>Yes</td><td>Actively wrong - it taxes exactly the behavior the product exists to encourage</td></tr>
+          <tr><td data-label="Value metric"><b>Basis points of recognized revenue</b></td><td>Yes</td><td>Yes - already forecast</td><td><b>Lead candidate</b> - but the bps must reflect complexity handled, not Stripe's commodity rate</td></tr>
+          <tr><td data-label="Value metric">Per active contract</td><td>Partly</td><td>Yes</td><td>Punishes long-tail contracts; useful as a secondary tier dimension</td></tr>
+          <tr><td data-label="Value metric">Per entity / per book</td><td>Weakly</td><td>Very</td><td>Good complexity proxy, poor value proxy - best as a platform floor</td></tr>
+          <tr><td data-label="Value metric">Per source system connected</td><td>No</td><td>Yes</td><td>Actively wrong - it taxes exactly the behavior the product exists to encourage</td></tr>
         </table>
       </div>
       <ul class="clean">
@@ -693,14 +732,14 @@
           <li><b>Partner for what's commodity infrastructure</b> <span class="weak">backed by network effects Recurly could never replicate: SSP logic, ERP connectors, tax</span></li>
           <li><b>One precondition before any of this is sellable</b> <span class="weak">- a public ingestion contract that external systems can write to without knowing Recurly's internals</span></li>
       </ul>
-      <div class="table-wrap">
-        <table class="rows">
+      <div class="table-wrap table-wrap-stack">
+        <table class="rows table-stack">
           <tr><th>Layer</th><th>Call</th><th>Why</th></tr>
-          <tr><td>Ingestion &amp; canonical event model</td><td><span class="pill own">Own</span></td><td>The differentiation lives here - turning any source system's contract changes into lifecycle events</td></tr>
-          <tr><td>Workflow, dashboards, audit trail</td><td><span class="pill own">Own</span></td><td>Where merchant trust is earned or lost; must be walkable by an external auditor</td></tr>
-          <tr><td>Novel SSP allocation logic</td><td><span class="pill partner">Partner</span></td><td>Genuinely hard, genuinely commodity once solved - don't rebuild it from scratch</td></tr>
-          <tr><td>ERP connectors (NetSuite, Intacct, SAP)</td><td><span class="pill partner">Partner</span></td><td>Mature middleware already exists (Celigo, Boomi); rebuild-risk isn't worth it</td></tr>
-          <tr><td>Tax logic</td><td><span class="pill partner">Partner</span></td><td>Already true for Recurly today (Avalara, Vertex)</td></tr>
+          <tr><td data-label="Layer">Ingestion &amp; canonical event model</td><td><span class="pill own">Own</span></td><td>The differentiation lives here - turning any source system's contract changes into lifecycle events</td></tr>
+          <tr><td data-label="Layer">Workflow, dashboards, audit trail</td><td><span class="pill own">Own</span></td><td>Where merchant trust is earned or lost; must be walkable by an external auditor</td></tr>
+          <tr><td data-label="Layer">Novel SSP allocation logic</td><td><span class="pill partner">Partner</span></td><td>Genuinely hard, genuinely commodity once solved - don't rebuild it from scratch</td></tr>
+          <tr><td data-label="Layer">ERP connectors (NetSuite, Intacct, SAP)</td><td><span class="pill partner">Partner</span></td><td>Mature middleware already exists (Celigo, Boomi); rebuild-risk isn't worth it</td></tr>
+          <tr><td data-label="Layer">Tax logic</td><td><span class="pill partner">Partner</span></td><td>Already true for Recurly today (Avalara, Vertex)</td></tr>
         </table>
       </div>
       <div class="callout">
@@ -709,9 +748,88 @@
     </section>
     <div class="divider"></div>
 
-    <!-- 09 -->
+    <!-- 10 -->
+    <section class="slide" id="business-case" data-title="Business Case">
+      <div class="eyebrow">10 &middot; Business Case</div>
+      <h2 class="title">Is this worth a team?</h2>
+      <p class="lede">Fourteen sections of strategic framing answer the "what" and "how." This section answers the one question a CPO actually has to answer: is the revenue opportunity large enough to justify the investment, and what does the unit math look like?</p>
+
+      <div class="section-label">Market sizing</div>
+      <ul class="clean">
+          <li><b>RevRec SaaS TAM is $5B+ and growing ~14% CAGR</b> <span class="weak">driven by ASC 606 / IFRS 15 compliance pressure, IPO readiness cycles, and increasing contract complexity across B2B SaaS</span></li>
+          <li><b>The mid-market segment Recurly can realistically reach in year 1-2</b> <span class="weak">is B2B SaaS companies with $10M-$500M ARR, multi-element contracts, and an existing pain signal - roughly 2,000-5,000 companies in the US and Europe</span></li>
+          <li><b>Penetrating 1-3% of that addressable segment in year 3</b> <span class="weak">is a plausible beachhead: 20-150 customers, depending on deal complexity and implementation capacity</span></li>
+      </ul>
+
+      <div class="section-label">ACV model</div>
+      <div class="table-wrap table-wrap-stack">
+        <table class="rows table-stack">
+          <tr><th>Customer tier</th><th>Recognized revenue</th><th>At 5bps</th><th>At 10bps</th></tr>
+          <tr><td data-label="Tier"><b>Small mid-market</b><br><span class="who">$10M-$50M ARR</span></td><td>$8M-$40M recognized</td><td>$4K-$20K ACV</td><td>$8K-$40K ACV</td></tr>
+          <tr><td data-label="Tier"><b>Core mid-market</b><br><span class="who">$50M-$200M ARR</span></td><td>$40M-$160M recognized</td><td>$20K-$80K ACV</td><td>$40K-$160K ACV</td></tr>
+          <tr><td data-label="Tier"><b>Upper mid-market</b><br><span class="who">$200M-$500M ARR</span></td><td>$160M-$400M recognized</td><td>$80K-$200K ACV</td><td>$160K-$400K ACV</td></tr>
+        </table>
+      </div>
+      <p class="fine">Platform floor (per entity/book) plus bps variable. Likely blend: $60-120K ACV at the core mid-market tier. Validate with Van Westendorp before committing to a number.</p>
+
+      <div class="section-label">Three-year revenue scenario</div>
+      <div class="panel">
+        <h3>Conservative path to $10M ARR</h3>
+        <div class="cols">
+          <div>
+            <div class="k">Year 1</div>
+            <div class="v">$0.5-1M ARR</div>
+            <div class="n">5-10 design partners converted to paid. Services-led, high-touch. Proves the model, seeds the eval set, and generates the case studies needed to sell year 2.</div>
+          </div>
+          <div>
+            <div class="k">Year 2</div>
+            <div class="v">$3-5M ARR</div>
+            <div class="n">30-50 customers. Self-serve onboarding enabled by RAG assist. ICP tightened from pilot learnings. First channel motion via existing Recurly enterprise relationships.</div>
+          </div>
+          <div>
+            <div class="k">Year 3</div>
+            <div class="v">$8-12M ARR</div>
+            <div class="n">80-120 customers. Standalone GTM motion. Anchor logo in the reference story. Upmarket motion begins if win rate against unbundlers holds above 40%.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">What this costs Recurly to be true</div>
+      <div class="grid2">
+        <div class="card tint">
+          <h4>Investment required</h4>
+          <ul class="clean" style="margin:8px 0 0;">
+            <li>Q1: $150-200K discovery budget (research, conjoint, pilot SE)</li>
+            <li>Q2 onwards: dedicated pod - 1 PM, 2 engineers, 1 designer</li>
+            <li>Solution architect hire or contract for enterprise implementation</li>
+            <li>Separate P&L from day one - bundled and standalone RevRec cannot share quota without cannibalizing each other</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Org decisions that must be made</h4>
+          <ul class="clean" style="margin:8px 0 0;">
+            <li>Bundled RevRec: frozen at current feature set, repriced, or sunset?</li>
+            <li>Sales motion: enterprise CFO/controller buyer is a 6-12 month cycle, not Recurly's current growth/eng motion</li>
+            <li>Channel: existing AEs with a new playbook, or a dedicated enterprise overlay?</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="section-label">What happens if the wedge flips</div>
+      <ul class="clean">
+          <li><b>If allocation judgment dominates in discovery</b> <span class="weak">the partner-for-SSP plan breaks - we outsourced the capability buyers actually want. Named partner candidates to evaluate before the gate: Ormae, CrossVista, or a licensing arrangement with an established allocation engine.</span></li>
+          <li><b>IFRS 16 / ASC 842 are explicitly out of v1 scope</b> <span class="weak">different buyer (real estate / facilities vs. finance), different recognition logic, different audit trail. They may belong in the corpus for reference; they are not in the product roadmap.</span></li>
+      </ul>
+
+      <div class="callout">
+        <b>The number that frames the investment decision.</b> A 50-customer cohort at $80K average ACV is $4M ARR. At Recurly's current gross margin profile, that's roughly $3M gross profit annually - enough to fund the pod and generate a return inside a three-year window. The question is not whether the market exists. The question is whether Recurly has the sales motion and implementation capacity to reach it, and that is what the Q1 discovery determines.
+      </div>
+    </section>
+    <div class="divider"></div>
+
+    <!-- 11 -->
     <section class="slide" id="ai" data-title="Applied AI &amp; Evals">
-      <div class="eyebrow">10 &middot; Applied AI</div>
+      <div class="eyebrow">11 &middot; Applied AI</div>
       <h2 class="title">Let the model find the exceptions. Let the controller decide.</h2>
       <p class="lede">Revenue recognition has a right answer, and the cost of getting it wrong is a restatement. Judgment stays with the controller. The model's job is narrower and more valuable: scan every contract event for discrepancies, surface the ones that need human attention, and store the reasoning so that when an auditor asks "why?" six months later, the answer takes seconds instead of days.</p>
 
@@ -732,7 +850,7 @@
       <div class="chart-card">
         <p class="ct">Onboarding assist pipeline</p>
         <p class="cs">The model surfaces. The controller decides. The system remembers.</p>
-        <svg viewBox="0 0 680 296" width="100%" style="max-height:296px;">
+        <div class="svg-scroll"><svg viewBox="0 0 680 296" width="100%" style="max-height:296px; min-width:520px;">
           <defs>
             <marker id="ah" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
               <path d="M0,0 L6,3 L0,6 Z" fill="#C4B9A6"/>
@@ -786,7 +904,7 @@
           <text x="511" y="235" font-size="10" fill="#6B6459">review, decide, log</text>
           <text x="511" y="247" font-size="10" fill="#6B6459">decision as evidence</text>
         </svg>
-        <div class="map-caption">The human gate is the product, not a safety afterthought.</div>
+        </div><div class="map-caption">The human gate is the product, not a safety afterthought.</div>
       </div>
 
       <div class="section-label">Use case 2: Exception dashboard for the controller</div>
@@ -830,14 +948,14 @@
           <li><b>Pressure-tested</b> <span class="weak">against the auditor track before any AI assist ships</span></li>
           <li><b>Held out, versioned, and re-run</b> <span class="weak">on every prompt change, model change, or corpus update - not a one-time exercise</span></li>
       </ul>
-      <div class="table-wrap">
-        <table class="rows">
+      <div class="table-wrap table-wrap-stack">
+        <table class="rows table-stack">
           <tr><th>Layer</th><th>What it measures</th><th>Method</th></tr>
-          <tr><td><b>Retrieval</b></td><td>Did the governing paragraph come back in the top-k?</td><td>Recall@k against accountant-labeled ground truth, reported per standard rather than pooled</td></tr>
-          <tr><td><b>Citation faithfulness</b></td><td>Does the cited paragraph actually support the claim?</td><td>LLM-as-judge, with a human spot-audit of the judge itself on a sampled slice</td></tr>
-          <tr><td><b>Treatment classification</b></td><td>Separate contract vs. prospective vs. cumulative catch-up</td><td>Accuracy against adjudicated ground truth, broken out by class - aggregate accuracy hides the rare-class failures that matter</td></tr>
-          <tr><td><b>Reasoning quality</b></td><td>Would an accountant accept the explanation as a rationale?</td><td>LLM-as-judge calibrated against human raters, with inter-rater agreement tracked</td></tr>
-          <tr><td><b>Miss rate</b></td><td>Exceptions the system waved through without flagging</td><td>The metric that governs the release decision - weighted far above precision</td></tr>
+          <tr><td data-label="Layer"><b>Retrieval</b></td><td>Did the governing paragraph come back in the top-k?</td><td>Recall@k against accountant-labeled ground truth, reported per standard rather than pooled</td></tr>
+          <tr><td data-label="Layer"><b>Citation faithfulness</b></td><td>Does the cited paragraph actually support the claim?</td><td>LLM-as-judge, with a human spot-audit of the judge itself on a sampled slice</td></tr>
+          <tr><td data-label="Layer"><b>Treatment classification</b></td><td>Separate contract vs. prospective vs. cumulative catch-up</td><td>Accuracy against adjudicated ground truth, broken out by class - aggregate accuracy hides the rare-class failures that matter</td></tr>
+          <tr><td data-label="Layer"><b>Reasoning quality</b></td><td>Would an accountant accept the explanation as a rationale?</td><td>LLM-as-judge calibrated against human raters, with inter-rater agreement tracked</td></tr>
+          <tr><td data-label="Layer"><b>Miss rate</b></td><td>Exceptions the system waved through without flagging</td><td>The metric that governs the release decision - weighted far above precision</td></tr>
         </table>
       </div>
 
@@ -866,7 +984,7 @@
 
     <!-- 10 -->
     <section class="slide" id="gtm" data-title="GTM">
-      <div class="eyebrow">11 &middot; Go-to-Market</div>
+      <div class="eyebrow">12 &middot; Go-to-Market</div>
       <h2 class="title">Land mid-market. Point at Salesforce. Don't start there.</h2>
       <p class="lede">Salesforce is the right north star and the wrong first customer. The ICP that gets this product proven is the segment that's outgrown Stripe RevRec but isn't ready for a multi-year Zuora implementation.</p>
       <div class="grid2">
@@ -884,14 +1002,14 @@
       <div class="section-label">Sequencing the win story</div>
       <ul class="clean">
           <li><b>Prove the model on the mid-market cohort first</b> <span class="weak">validate schedule accuracy and price with real design partners before any enterprise pitch</span></li>
-          <li><b>A Salesforce-shaped anchor logo becomes the reference story after proof exists</b> <span class="weak">not before - leading with the aspirational logo is how this pitch loses credibility with finance buyers</span></li>
+          <li><b>Enterprise logos follow proof, not the other way round</b> <span class="weak">win rate and implementation days from the mid-market cohort are the evidence that earns an upmarket conversation</span></li>
       </ul>
     </section>
     <div class="divider"></div>
 
     <!-- 11 -->
     <section class="slide" id="risks" data-title="Risks">
-      <div class="eyebrow">12 &middot; Risks</div>
+      <div class="eyebrow">13 &middot; Risks</div>
       <h2 class="title">Where I'd hold firm, and where I'd bend</h2>
       <div class="grid2">
         <div class="card tint">
@@ -921,7 +1039,7 @@
 
     <!-- 12 -->
     <section class="slide" id="metrics" data-title="Metrics">
-      <div class="eyebrow">13 &middot; Measurement</div>
+      <div class="eyebrow">14 &middot; Measurement</div>
       <h2 class="title">Four layers, and an honest note on lag</h2>
       <div class="section-label">Merchant outcome</div>
       <ul class="clean">
@@ -952,13 +1070,17 @@
 
     <!-- 13 -->
     <section class="slide" id="close" data-title="The First 90 Days">
-      <div class="eyebrow">14 &middot; Close</div>
+      <div class="eyebrow">15 &middot; Close</div>
       <h2 class="title">What I'd actually do in the first 90 days</h2>
       <div class="steps">
-        <div class="step"><div class="n">1</div><div><h5>Weeks 1–5 &middot; Discovery</h5><p>Run the twenty interviews in Section 06, including the auditor track and the lost-deal cohort. Output is the ranked exception taxonomy and a go/no-go on the lifecycle wedge.</p></div></div>
-        <div class="step"><div class="n">2</div><div><h5>Weeks 4–8 &middot; Willingness to pay</h5><p>Run the pricing instruments against the same cohort - Van Westendorp for the range, conjoint for the package. Output is a monetization model and a defensible price band, before the roadmap is locked.</p></div></div>
-        <div class="step"><div class="n">3</div><div><h5>Weeks 5–10 &middot; Ingestion contract</h5><p>Spec the public schema and API surface with Engineering - the precondition every other milestone depends on.</p></div></div>
-        <div class="step"><div class="n">4</div><div><h5>Weeks 8–12 &middot; Pilot and golden set</h5><p>First design-partner pilot against real historical contract data. Measure schedule accuracy against their own prior close, and use the same adjudicated contracts to seed the eval golden set before any AI assist is built.</p></div></div>
+        <div class="step"><div class="n">1</div><div><h5>Weeks 1-3 &middot; Desk research first</h5><p>Mine Recurly's own lost-deal notes, support tickets, and CRM loss reasons before spending executive calendar. Add public signal: G2 reviews, Zuora and Maxio churn indicators, revenue accountant job postings. Pre-qualifies the buyer interviews and sharpens the question set.</p></div></div>
+        <div class="step"><div class="n">2</div><div><h5>Weeks 2-6 &middot; Discovery interviews</h5><p>20 buyer interviews across the five cohorts in Section 07, plus 3 auditors on a separate track. Output: ranked exception taxonomy, trigger-event pattern, and existing-spend evidence.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h5>Week 6 &middot; Decision gate</h5><p><b>Go criterion:</b> at least 12 of 20 buyers name contract-change propagation as their top pain source, and at least 8 have existing spend. <b>No-go:</b> allocation judgment dominates, or no existing budgets found - thesis flips or full stop. Decision made with Priya and VP Product before any engineering begins.</p></div></div>
+        <div class="step"><div class="n">4</div><div><h5>Weeks 6-10 &middot; WTP instruments + ingestion spec</h5><p>Run Van Westendorp and conjoint against the buyer cohort in parallel with Engineering speccing the public ingestion contract. Output: monetization model, price band, and API schema before the roadmap locks.</p></div></div>
+        <div class="step"><div class="n">5</div><div><h5>Weeks 10-14 &middot; Services-led pilot</h5><p>First design-partner pilot is manually services-led: a solutions engineer runs real historical contracts through the recognition logic by hand, validating accuracy before the ingestion API exists. Proves the model without betting the timeline on engineering. Same contracts seed the AI eval golden set.</p></div></div>
+      </div>
+      <div class="callout" style="margin-top:28px;">
+        <b>The ask.</b> One quarter of discovery funding ($150-200K: researcher time, buyer incentives, conjoint tooling), a solutions engineer for the services-led pilot, and a named go/no-go decision at week 6 with Priya and VP Product. If the gate clears: a dedicated product pod (1 PM, 2 engineers, 1 designer) with a standalone P&L and a Q3 launch target for the mid-market ICP.
       </div>
       <div class="close-line">Recurly doesn't need to beat Zuora at Zuora's game. It needs to be the subledger that gets the lifecycle event right - for revenue it doesn't bill today, starting with the customers who've already outgrown the commodity option.</div>
     </section>
