@@ -739,14 +739,41 @@
         <b>The precondition nobody skips.</b> RevRec today is presumably wired to Recurly Subscriptions' internal event bus. Before any of this is credible externally, it needs a public ingestion contract - a schema and API surface a CPQ system, a CSV export, or a NetSuite connector can write to without knowing Recurly's internals exist.
       </div>
 
+      <div class="section-label">What v1 actually is</div>
+      <div class="grid2">
+        <div class="card tint">
+          <h4>v1 includes</h4>
+          <ul class="clean" style="margin:8px 0 0;">
+            <li>Public ingestion API plus CSV import for contracts and lifecycle events</li>
+            <li>Automatic schedule generation and re-generation on contract change</li>
+            <li>ASC 606 / IFRS 15 recognition patterns: ratable, point-in-time, milestone, usage</li>
+            <li>Multi-entity, multi-book, multi-currency</li>
+            <li>Auditor-walkable evidence trail and versioned schedule history</li>
+            <li>Historical backload and shadow-run reconciliation tooling</li>
+            <li>Journal entry export to NetSuite and Sage Intacct</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>v1 explicitly excludes</h4>
+          <ul class="clean" style="margin:8px 0 0;">
+            <li>Leases (IFRS 16 / ASC 842) - different buyer, separate product decision</li>
+            <li>Novel SSP allocation logic - licensed or partnered, not built</li>
+            <li>The AI onboarding assist - ships only after the eval harness clears</li>
+            <li>Self-serve signup - v1 is sales-led with a solutions architect</li>
+            <li>SAP and Oracle connectors - NetSuite and Intacct cover the mid-market ICP</li>
+            <li>Real-time recognition - daily batch is what the close actually needs</li>
+          </ul>
+        </div>
+      </div>
+
       <div class="section-label">The migration objection, and the answer</div>
       <p class="body">The first question in every sales conversation: "I have 400 live contracts and a signed audit opinion. How do I move mid-year without breaking the close?" The answer has to be a product decision, not a services promise.</p>
       <div class="steps">
-        <div class="step"><div class="n">1</div><div><h5>Shadow run, not cutover</h5><p>Ingest the historical contract portfolio and run recognition in parallel while the existing system stays the book of record. No production risk, no change to the close process.</p></div></div>
+        <div class="step"><div class="n">1</div><div><h5>Backload history, run in shadow</h5><p>Ingest the live contract portfolio plus enough history to reproduce prior-period schedules. The existing system stays the book of record throughout. Historical backload is the single biggest driver of implementation slip, so it is scoped as product tooling in v1 rather than left to services.</p></div></div>
         <div class="step"><div class="n">2</div><div><h5>Reconcile against closed periods</h5><p>Compare our output to their last three closed months, line by line. Variances are the product's first real test - and the reconciliation report is the artifact the auditor actually wants.</p></div></div>
-        <div class="step"><div class="n">3</div><div><h5>Cut over at a fiscal boundary</h5><p>Switch the book of record at year end or quarter end with the shadow-run comparison as evidence. Never mid-period, never without the auditor having seen the variance report.</p></div></div>
+        <div class="step"><div class="n">3</div><div><h5>Opening balance signed off, then cut over</h5><p>The customer's controller signs the opening deferred-revenue balance and their auditor accepts the continuity evidence from the shadow run. Only then does the book of record switch, at a quarter or year boundary. Never mid-period, never without that signature - it is the artifact that makes the migration defensible a year later.</p></div></div>
       </div>
-      <p class="fine">Migration is free, takes 6-10 weeks, and is staffed by us. Charging for it is a killer (Section 07) - and more practically, the shadow run is how the product proves schedule accuracy, so the cost belongs in sales, not in the invoice.</p>
+      <p class="fine">Migration is free, takes 6-10 weeks, and is staffed by us. Charging for it is a killer (Section 07), and more practically the shadow run is how the product proves schedule accuracy, so the cost belongs in sales rather than the invoice. "Time to live" in the metrics section means signed opening balance, not first successful API call.</p>
     </section>
     <div class="divider"></div>
 
@@ -794,7 +821,7 @@
           <div>
             <div class="k">Year 3</div>
             <div class="v">$8-12M ARR</div>
-            <div class="n">80-120 customers. Standalone GTM motion. Anchor logo in the reference story. Upmarket motion begins once win rate against unbundlers is measured and holding - the 40% figure is a hypothesis to instrument in year 1, not a target we have earned.</div>
+            <div class="n">80-120 customers. Standalone GTM motion. Anchor logo in the reference story. Upmarket motion begins once win rate against the unbundlers is measured and holding. We have no baseline for that number yet, which is why it is instrumented from the first competitive deal rather than asserted here.</div>
           </div>
         </div>
       </div>
@@ -806,7 +833,7 @@
           <ul class="clean" style="margin:8px 0 0;">
             <li>Q1: $150-200K discovery budget (research, conjoint, pilot SE)</li>
             <li>Q2 onwards: 1 PM, 5 engineers, 1 designer, 1 solutions architect. A source-agnostic subledger with SOX-grade audit trails is not a 2-engineer build</li>
-            <li>SOC 1 Type II: $150-250K initial audit plus annual recertification. Table stakes for a subledger inside an auditor's scope</li>
+            <li>SOC 1 Type II: $150-250K initial plus annual recertification. Type II needs a 6-12 month observation window, so controls work starts in Q2 and the report lands mid-year 2</li>
             <li>Legal review for liability caps - a recognition error that causes a restatement is real contractual exposure</li>
             <li>Separate P&L from day one - bundled and standalone RevRec cannot share quota without cannibalizing each other</li>
           </ul>
@@ -860,6 +887,7 @@
           <li><b>Peak cash need is roughly $5M, in year 2.</b> <span class="weak">Contribution turns positive in year 3. Payback on the total investment lands in year 4-5 if the ARR ladder holds.</span></li>
           <li><b>CAC and payback, derived from the S&amp;M line above.</b> <span class="weak">Year 3 spends $3.0M to land 58 new logos: $52K sales-and-marketing CAC, or roughly $70K fully loaded once onboarding is allocated. Against $90K ACV at 80% gross margin, that is a 12-month payback. Year 2 is worse ($64K CAC on 28 logos) because the motion is still services-led - the improvement is the whole argument for RAG onboarding.</span></li>
           <li><b>Retention: 92% logo, 108-112% net revenue.</b> <span class="weak">Subledgers are sticky because switching means re-validating every schedule with your auditor. Expansion comes from the customer's own recognized revenue growing and from added entities and books - which is the strongest argument for pricing off recognized revenue in the first place. Both assumptions are doing real work here and should be the first thing tested against comparable point solutions.</span></li>
+          <li><b>SOC 1 Type II gates part of year 1 revenue.</b> <span class="weak">The observation window means no report until mid-year 2. Design partners will sign without it; procurement at larger accounts often will not. Year 1's 8 customers assume design-partner terms with a contractual commitment to deliver the report - if that proves unsellable, year 1 ARR moves right by two quarters and peak cash grows.</span></li>
           <li><b>Year 1 gross margin is deliberately negative.</b> <span class="weak">Services-led pilots cost more than they bill. That is the price of proving the model - and it is exactly why RAG-assisted onboarding is a GTM lever rather than a feature: it is what bends the margin curve in year 2.</span></li>
       </ul>
 
