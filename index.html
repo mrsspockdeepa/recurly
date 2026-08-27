@@ -304,7 +304,15 @@
       </div>
 
       <div class="section-label">What this covers</div>
-      <p class="fine">Customer discovery, competitive position, willingness to pay, technical feasibility, applied AI and evals, and go-to-market. The anchor customer shape throughout is Salesforce-like: multi-year, multi-element, usage-inclusive contracts. Built to be argued with, not read.</p>
+      <ul class="clean">
+          <li><b>Customer discovery</b> <span class="weak">20 interviews, auditor track, kill criteria</span></li>
+          <li><b>Competitive landscape</b> <span class="weak">five postures, positioning map</span></li>
+          <li><b>Willingness to pay</b> <span class="weak">Ramanujam framing, leaders/fillers/killers, pricing instruments</span></li>
+          <li><b>Technical feasibility</b> <span class="weak">build vs. partner decisions, ingestion precondition</span></li>
+          <li><b>Applied AI and evals</b> <span class="weak">RAG onboarding, controller dashboard, eval harness</span></li>
+          <li><b>Go-to-market</b> <span class="weak">ICP, entry motion, sequencing the win story</span></li>
+      </ul>
+      <p class="fine" style="margin-top:14px;">Anchor customer shape throughout: Salesforce-like - multi-year, multi-element, usage-inclusive contracts. Built to be argued with, not read.</p>
     </section>
     <div class="divider"></div>
 
@@ -312,7 +320,11 @@
     <section class="slide" id="the-gap" data-title="The Gap">
       <div class="eyebrow">02 &middot; The Gap</div>
       <h2 class="title">Two customer bases Recurly can't see today</h2>
-      <p class="lede">RevRec today is a feature of Recurly Subscriptions. If a contract's billing event doesn't originate inside Recurly, RevRec never learns about it - regardless of how large or strategically important that customer is.</p>
+      <ul class="clean" style="margin-bottom:26px;">
+          <li><b>RevRec today is a feature of Recurly Subscriptions.</b> <span class="weak">If a contract's billing event doesn't originate inside Recurly, RevRec never learns about it - regardless of how strategically important that customer is.</span></li>
+          <li><b>Most B2B contract revenue never touches Recurly's billing engine.</b> <span class="weak">Multi-element deals, CPQ-sourced invoices, marketplace revenue - invisible to a billing-coupled RevRec.</span></li>
+          <li><b>The market for "gets the schedule right" is bigger than "bills the transaction."</b> <span class="weak">That escalation path runs to the CFO regardless of whose platform is upstream.</span></li>
+      </ul>
       <div class="grid2">
         <div class="card">
           <h4>B2B SaaS with its own billing stack</h4>
@@ -529,7 +541,11 @@
     <section class="slide" id="the-wedge" data-title="The Wedge">
       <div class="eyebrow">05 &middot; Why Recurly, Why Now</div>
       <h2 class="title">The differentiation isn't depth. It's lifecycle fidelity.</h2>
-      <p class="lede">Recurly won't out-allocate Zuora on SSP edge cases with a decade less experience. It doesn't need to. It already runs the one primitive every unbundler struggles with, at massive scale.</p>
+      <ul class="clean" style="margin-bottom:26px;">
+          <li><b>Recurly won't out-allocate Zuora on SSP edge cases</b> <span class="weak">with a decade less experience. Competing on Zuora's terms is a losing bet regardless of engineering investment.</span></li>
+          <li><b>It already runs the one primitive every unbundler struggles with</b> <span class="weak">- lifecycle-event-to-schedule adjustment, millions of times a day, for consumer subscriptions. That's the hard part.</span></li>
+          <li><b>The bet: generalize the lifecycle-to-schedule engine</b> <span class="weak">into an ingestion-agnostic layer. Compete on "gets the event right," not "handles every allocation edge case."</span></li>
+      </ul>
       <ul class="clean">
         <li><b>Every upgrade, downgrade, pause, and cancellation</b> <span class="weak">already generates a schedule adjustment inside Recurly's engine - millions of times a day, for consumer subscriptions.</span></li>
         <li><b>That's the hard part, not a side effect.</b> <span class="weak">LedgerUp's own positioning: most deferred-revenue errors originate in mismatched contract and billing data, not in the recognition logic itself.</span></li>
@@ -674,7 +690,11 @@
           <tr><td>Per source system connected</td><td>No</td><td>Yes</td><td>Actively wrong - it taxes exactly the behavior the product exists to encourage</td></tr>
         </table>
       </div>
-      <p class="fine">Likely shape: a platform fee scaled to entity and book count, plus bps on recognized revenue above a floor. Confirm the structure with buyers before setting the number.</p>
+      <ul class="clean">
+          <li><b>Platform floor</b> <span class="weak">scaled to entity and book count - a complexity proxy buyers can understand and budget</span></li>
+          <li><b>Revenue variable</b> <span class="weak">bps on recognized revenue above the floor, priced for complexity handled - not at Stripe's commodity rate</span></li>
+          <li><b>Confirm with buyers before locking the number</b> <span class="weak">the structure should be validated in the Van Westendorp and conjoint runs before it reaches the pricing page</span></li>
+      </ul>
 
       <div class="section-label">How I'd actually measure willingness to pay</div>
       <div class="grid2">
@@ -683,7 +703,10 @@
         <div class="card"><h4>Choice-based conjoint</h4><p>Forced trade-offs between bundles at different prices. The only reliable way to separate leaders from fillers when everyone claims they want everything.</p></div>
         <div class="card"><h4>MaxDiff</h4><p>Best-worst scaling across the capability list. Cheaper and faster than conjoint; good enough to rank the roadmap.</p></div>
       </div>
-      <p class="fine">Deflate stated intent before it reaches the business case. "Definitely would buy" overstates real behavior badly, and an undeflated top box is how a plausible model turns into a hockey stick nobody hits.</p>
+      <ul class="clean">
+          <li><b>Deflate stated intent before it reaches the business case.</b> <span class="weak">"Definitely would buy" overstates real purchase behavior badly.</span></li>
+          <li><b>An undeflated top box is how a plausible model turns into a hockey stick nobody hits.</b> <span class="weak">Apply standard deflation factors or cross-validate against any existing transaction data.</span></li>
+      </ul>
 
       <div class="callout">
         <b>The value story the sales team has to be able to tell:</b> this doesn't cost X per year, it displaces Y reconciliation hours per close, returns Z days of close time, and removes a named category of audit exposure. If the buyer can't repeat that sentence back, the price is being defended against the software line item instead of the cost it replaces - and that argument is lost before it starts.
@@ -695,7 +718,11 @@
     <section class="slide" id="build-buy-partner" data-title="Build, Buy, Partner">
       <div class="eyebrow">09 &middot; Technical Feasibility</div>
       <h2 class="title">Don't build a second Zuora</h2>
-      <p class="lede">The honest technical call: what Recurly should own, what it should rent, and what has to happen before any of this is sellable.</p>
+      <ul class="clean" style="margin-bottom:26px;">
+          <li><b>Own what merchants judge Recurly on</b> <span class="weak">and what compounds over time: ingestion, lifecycle handling, audit trail, workflow</span></li>
+          <li><b>Partner for what's commodity infrastructure</b> <span class="weak">backed by network effects Recurly could never replicate: SSP logic, ERP connectors, tax</span></li>
+          <li><b>One precondition before any of this is sellable</b> <span class="weak">- a public ingestion contract that external systems can write to without knowing Recurly's internals</span></li>
+      </ul>
       <div class="table-wrap">
         <table class="rows">
           <tr><th>Layer</th><th>Call</th><th>Why</th></tr>
@@ -828,7 +855,11 @@
       </ul>
 
       <div class="section-label">Evals</div>
-      <p class="body">The golden set gets built from design-partner contracts during the Section 07 pilots, adjudicated by their own accountants and pressure-tested against the auditor track. Held out, versioned, and re-run on every prompt, model, or corpus change.</p>
+      <ul class="clean">
+          <li><b>Source</b> <span class="weak">design-partner contracts from Section 07 pilots, adjudicated by their own accountants</span></li>
+          <li><b>Pressure-tested</b> <span class="weak">against the auditor track before any AI assist ships</span></li>
+          <li><b>Held out, versioned, and re-run</b> <span class="weak">on every prompt change, model change, or corpus update - not a one-time exercise</span></li>
+      </ul>
       <div class="table-wrap">
         <table class="rows">
           <tr><th>Layer</th><th>What it measures</th><th>Method</th></tr>
@@ -854,7 +885,12 @@
       </ul>
 
       <div class="section-label">Why this is a GTM lever, not a feature</div>
-      <p class="body">If RAG-assisted onboarding takes implementation from months to weeks and the exception dashboard cuts close time from days to hours, those show up in the value story directly: displaced reconciliation headcount, recovered close-cycle time, and instant audit retrieval instead of weeks of rework. Neither becomes a separate AI SKU - charging for the thing that makes the product usable is the same mistake as metering the audit trail.</p>
+      <ul class="clean">
+          <li><b>Faster implementation</b> <span class="weak">RAG-assisted onboarding removes the biggest implementation-drag advantage incumbents hold</span></li>
+          <li><b>Lower cost to serve mid-market</b> <span class="weak">a segment that would otherwise be unprofitable to onboard at high-touch consulting rates</span></li>
+          <li><b>Direct value story</b> <span class="weak">displaced reconciliation headcount, recovered close-cycle time, instant audit retrieval instead of weeks of rework</span></li>
+          <li><b>Neither becomes a separate AI SKU</b> <span class="weak">charging for the thing that makes the product usable is the same mistake as metering the audit trail</span></li>
+      </ul>
     </section>
     <div class="divider"></div>
 
@@ -870,9 +906,16 @@
         <div class="card"><h4>Packaging</h4><p>Sold standalone, not gated behind Recurly Subscriptions - the unbundling has to be true in the price sheet, not just the pitch.</p></div>
       </div>
       <div class="section-label">Segment on willingness to pay, not company size</div>
-      <p class="body">ARR band is a convenient proxy but a poor segmentation axis. The real cut is contract complexity crossed with trigger urgency: a $40M-ARR company three months from an S-1 has far higher willingness to pay than a $300M company with a clean audit history and a working spreadsheet. Segment on that, and the pricing tiers follow the segments rather than the other way round.</p>
+      <ul class="clean">
+          <li><b>ARR band is a convenient proxy but a poor segmentation axis</b> <span class="weak">it says nothing about contract complexity or urgency</span></li>
+          <li><b>The real cut is contract complexity crossed with trigger urgency</b> <span class="weak">a $40M-ARR company three months from an S-1 has far higher willingness to pay than a $300M company with a clean audit history and a working spreadsheet</span></li>
+          <li><b>Segment on that</b> <span class="weak">and the pricing tiers follow the segments rather than the other way round</span></li>
+      </ul>
       <div class="section-label">Sequencing the win story</div>
-      <p class="body">Prove the model on the mid-market cohort first. A Salesforce-shaped anchor logo becomes the reference story once real design partners validate accuracy and price - leading with the aspirational logo before that proof exists is how this pitch loses credibility with a room full of finance buyers.</p>
+      <ul class="clean">
+          <li><b>Prove the model on the mid-market cohort first</b> <span class="weak">validate schedule accuracy and price with real design partners before any enterprise pitch</span></li>
+          <li><b>A Salesforce-shaped anchor logo becomes the reference story after proof exists</b> <span class="weak">not before - leading with the aspirational logo is how this pitch loses credibility with finance buyers</span></li>
+      </ul>
     </section>
     <div class="divider"></div>
 
@@ -883,11 +926,17 @@
       <div class="grid2">
         <div class="card tint">
           <h4>Holding firm</h4>
-          <p>The lifecycle-native wedge is real. Competing on Zuora's contract-depth terms is a losing bet regardless of engineering investment - a decade head start doesn't close.</p>
+          <ul class="clean" style="margin:8px 0 0;">
+            <li>The lifecycle-native wedge is real</li>
+            <li>Competing on Zuora's contract-depth terms is a losing bet - a decade head start doesn't close regardless of engineering investment</li>
+          </ul>
         </div>
         <div class="card">
           <h4>Open to evidence</h4>
-          <p>If discovery shows SSP allocation is the actual blocker - not lifecycle handling - that reorders the build priority toward allocation logic sooner than planned.</p>
+          <ul class="clean" style="margin:8px 0 0;">
+            <li>If discovery shows SSP allocation is the actual blocker (not lifecycle handling), the build order flips</li>
+            <li>If no design partner has existing spend on this problem, the pain isn't budget-worthy yet</li>
+          </ul>
         </div>
       </div>
       <ul class="clean">
@@ -904,30 +953,30 @@
     <section class="slide" id="metrics" data-title="Metrics">
       <div class="eyebrow">13 &middot; Measurement</div>
       <h2 class="title">Four layers, and an honest note on lag</h2>
-      <div class="panel">
-        <h3>How we'd know it worked</h3>
-        <div class="cols">
-          <div>
-            <div class="k">Merchant outcome</div>
-            <div class="v">Days to close</div>
-            <div class="n">Schedule accuracy vs. prior manual process, and time from contract signed to live in the subledger.</div>
-          </div>
-          <div>
-            <div class="k">Platform health</div>
-            <div class="v">Zero-touch rate</div>
-            <div class="n">Contracts ingested per source system; share of lifecycle events reconciled with no manual touch; AI override rate trend.</div>
-          </div>
-          <div>
-            <div class="k">Commercial</div>
-            <div class="v">Realized vs. list</div>
-            <div class="n">Discount depth, win rate against the unbundlers specifically, and implementation days per deal.</div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <h4>Compliance risk - the lagging layer</h4>
-        <p>Audit findings and restatement rate are annual and lagging by nature. The leading proxy in the meantime is exception rate, reconciliation variance, and override rate. Name that gap up front rather than pretend the lagging number is live.</p>
-      </div>
+      <div class="section-label">Merchant outcome</div>
+      <ul class="clean">
+          <li><b>Schedule accuracy</b> <span class="weak">vs. prior manual process, per design partner</span></li>
+          <li><b>Days to close</b> <span class="weak">measured before and after; target is a measurable reduction within the first two close cycles</span></li>
+          <li><b>Time to live</b> <span class="weak">days from contract signed to the contract appearing in the subledger</span></li>
+      </ul>
+      <div class="section-label">Platform health</div>
+      <ul class="clean">
+          <li><b>Contracts ingested per source system</b> <span class="weak">tracks whether multi-source ingestion is actually being used</span></li>
+          <li><b>Zero-touch rate</b> <span class="weak">share of lifecycle events reconciled with no manual journal entry</span></li>
+          <li><b>AI override rate</b> <span class="weak">if accountants start overriding more often, something has drifted - corpus, model, or contract mix</span></li>
+      </ul>
+      <div class="section-label">Commercial</div>
+      <ul class="clean">
+          <li><b>Realized price vs. list</b> <span class="weak">discount depth signals whether the value story is landing with finance buyers</span></li>
+          <li><b>Win rate against the unbundlers</b> <span class="weak">specifically RightRev, Leapfin, Ordway - the most comparable alternatives</span></li>
+          <li><b>Implementation days per deal</b> <span class="weak">the GTM lever claim lives or dies here</span></li>
+      </ul>
+      <div class="section-label">Compliance risk - the lagging layer</div>
+      <ul class="clean">
+          <li><b>Audit findings</b> <span class="weak">annual by nature; the leading proxy is exception rate and reconciliation variance</span></li>
+          <li><b>Restatement rate</b> <span class="weak">annual and lagging - name that gap up front rather than pretend it's a live metric</span></li>
+          <li><b>Override rate trend</b> <span class="weak">the best early warning signal that something has drifted before it reaches an audit</span></li>
+      </ul>
     </section>
     <div class="divider"></div>
 
